@@ -14,11 +14,11 @@ public class ChatClient {
 	private final static String IP = "localhost";
 	private final static int PORT = 5556;
 
-	private ChatClientView view;
+	private ChatClientView view; // для отображения информации пользователю
 	private Socket socket;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
-	private String name;
+	private String name; // имя пользователя, инициализируется при регистрации
 
 	public static void main(String[] args) {
 		try {
@@ -55,6 +55,8 @@ public class ChatClient {
 	}
 
 	private void createThreads() {
+
+		// поток для приема сообщений
 		Thread inThread = new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -62,9 +64,9 @@ public class ChatClient {
 						Message message = (Message) in.readObject();
 						if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
 							view.showStrMessage(message.getSender() + ": " + message.getText());
-						} else if (message.getType().equals(MessageType.EXIT_MESSAGE)) {
+						} else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
 							view.showStrMessage(message.getSender() + ": " + message.getText());
-							sendMessage(new Message(MessageType.EXIT_MESSAGE));
+							sendMessage(new Message(MessageType.LEAVE_MESSAGE));
 						}
 					}
 				} catch (ClassNotFoundException | IOException e) {
@@ -73,6 +75,7 @@ public class ChatClient {
 			}
 		});
 
+		// поток для отправки сообщений
 		Thread outThread = new Thread(new Runnable() {
 			public void run() {
 				try {
@@ -112,6 +115,7 @@ public class ChatClient {
 		in = new ObjectInputStream(socket.getInputStream());
 	}
 
+	// показать пользавателю список возможных команд
 	private void showCommands() {
 		view.showStrMessage("Commands:");
 		view.showStrMessage("/register client nickname");

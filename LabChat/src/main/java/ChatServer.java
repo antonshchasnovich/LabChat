@@ -128,7 +128,7 @@ public class ChatServer {
 						unemployedAgents.add(agent);
 						isConnected = false;
 					} else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
-						agent.getOutStream().writeObject(new Message(MessageType.EXIT_MESSAGE, client.getName() + " leaved chat.", "Server"));
+						agent.getOutStream().writeObject(new Message(MessageType.LEAVE_MESSAGE, client.getName() + " leaved chat.", "Server"));
 						unemployedAgents.add(agent);
 						agent = null;
 					} else if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
