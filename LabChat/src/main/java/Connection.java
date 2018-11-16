@@ -1,112 +1,153 @@
-import java.io.IOException;
-import java.util.ArrayDeque;
-
 import message.Message;
 import message.MessageType;
+import org.slf4j.Logger;
 import user.Agent;
 import user.Client;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
 
 //Поток, в котором мы слушаем агента создается при создании объекта этого класса
 //Поток, в котором слушаем агента создается и возвращается методом getAgentClientThread()
 
 public class Connection extends Thread {
-	private boolean isConnected = true;
-	private final Client client;
-	private final ChatServer server;
-	private final ArrayDeque<Message> bufferedMessages = new ArrayDeque<>(); // коллекция для хранения сообщений, написанных во время того как у клиента не
-																				// было агента
-	private Agent agent = null;
+    private boolean isConnected = true;
+    private final Client client;
+    private final UsersStorage usersStorage;
+    private final ArrayDeque<Message> bufferedMessages = new ArrayDeque<>();
+    private String serverName;
+    private Logger logger;
 
-	public Connection(ChatServer server, Client client) {
-		this.server = server;
-		this.client = client;
-	}
+    private Agent agent = null;
 
-	// client-agent thread
-	@Override
-	public void run() {
-		while (isConnected) {
-			try {
-				Message message = (Message) client.getInStream().readObject();
-				if (message.getType().equals(MessageType.EXIT_MESSAGE)) {
-					server.getConnections().remove(this);
-					if (agent != null) {
-						sendToAgent(new Message(MessageType.LEAVE_MESSAGE, client.getName() + " leaved chat.", server.getServerName()));
-					}
-					isConnected = false;
-				} else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
-					if (agent != null) {
-						sendToAgent(new Message(MessageType.LEAVE_MESSAGE, client.getName() + " leaved chat.", server.getServerName()));
-					}
-				} else if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
-					if (agent != null) {
-						sendToAgent(message);
-					} else {
-						sendToClient(new Message(MessageType.TEXT_MESSAGE, "Agent is being selected. Please wait...", server.getServerName()));
-						if (!server.getConnections().contains(this)) {
-							server.addConnectionInQueue(Connection.this);
-						}
-						bufferedMessages.add(message);
-					}
-				}
-			} catch (IOException | ClassNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+    public Connection(UsersStorage usersStorage, Client client, String serverName) {
+        this.usersStorage = usersStorage;
+        this.client = client;
+        this.serverName = serverName;
+    }
 
-	// returns agent-client thread
-	public Thread getAgentClientThread() {
-		return new Thread(new Runnable() {
-			public void run() {
-				while (isConnected && agent != null) {
-					try {
-						Message message = (Message) agent.getInStream().readObject();
-						if (message.getType().equals(MessageType.EXIT_MESSAGE)) {
-							String strMessage = "Agent " + agent.getName() + " leaved chat. You will be connected with another agent.";
-							sendToClient(new Message(MessageType.TEXT_MESSAGE, strMessage, server.getServerName()));
-							agent = null;
-							server.addConnectionInQueue(Connection.this);
-						} else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
-							server.addAgentInQueue(agent);
-							agent = null;
-						} else if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
-							if (agent != null && isConnected) {
-								client.getOutStream().writeObject(message);
-							}
-						}
-					} catch (ClassNotFoundException | IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-	}
+    // client-agent thread
+    @Override
+    public void run() {
+        while (isConnected) {
+            try {
+                Message message;
+                try{
+                    message = (Message) client.getInStream().readObject();
+                }catch(IOException e){
+                    close();
+                    break;
+                }
+                if (message.getType().equals(MessageType.EXIT_MESSAGE)) {
+                    close();
+                } else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
+                    if (agent != null) {
+                        sendToAgent(new Message(MessageType.LEAVE_MESSAGE, client.getName() + " leaved chat.", serverName));
+                        logger.info("Agent " + agent.getName() + " and client " + client.getName() + " finished chat.");
+                    }
+                } else if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
+                    if (agent != null) {
+                        sendToAgent(message);
+                    } else {
+                        sendToClient(new Message(MessageType.TEXT_MESSAGE, "Agent is being selected. Please wait...", serverName));
+                        bufferedMessages.add(message);
+                        if (!usersStorage.getConnections().contains(this)) {
+                            usersStorage.addConnectionInQueue(Connection.this);
+                        }
+                    }
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                logger.warn(e.toString());
+            }
+        }
+    }
 
-	public void setAgent(Agent agent) {
-		this.agent = agent;
-	}
+    // returns agent-client thread
+    public Thread getAgentClientThread() {
+        return new Thread(new Runnable() {
+            public void run() {
+                try {
+                    handShake();
+                    sendBufferedMessages();
+                    while (isConnected && agent != null) {
+                        Message message;
+                        try{
+                            message = (Message) agent.getInStream().readObject();
+                        }catch (IOException e){
+                            closeAgentThread();
+                            break;
+                        }
+                        if (message.getType().equals(MessageType.EXIT_MESSAGE)) {
+                            closeAgentThread();
+                        } else if (message.getType().equals(MessageType.LEAVE_MESSAGE)) {
+                            usersStorage.addAgentInQueue(agent);
+                            agent = null;
+                        } else if (message.getType().equals(MessageType.TEXT_MESSAGE)) {
+                            if (agent != null && isConnected) {
+                                client.getOutStream().writeObject(message);
+                            }
+                        }
+                    }
+                } catch (ClassNotFoundException |
+                        IOException e) {
+                    logger.warn(e.toString());
+                }
+            }
+        });
+    }
 
-	public boolean isConnected() {
-		return isConnected;
-	}
+    private void close()throws IOException{
+        usersStorage.getConnections().remove(this);
+        if (agent != null) {
+            sendToAgent(new Message(MessageType.LEAVE_MESSAGE, client.getName() + " leaved chat.", serverName));
+            logger.info("Agent " + agent.getName() + " and client " + client.getName() + " finished chat.");
+        }
+        isConnected = false;
+    }
 
-	public void handShake() throws IOException {
-		sendToClient(new Message(MessageType.TEXT_MESSAGE, "You are sent to agent " + agent.getName(), server.getServerName()));
-		sendToAgent(new Message(MessageType.TEXT_MESSAGE, "Client " + client.getName() + " sent to you.", server.getServerName()));
-	}
+    private void closeAgentThread() throws IOException{
+        String strMessage = "Agent " + agent.getName() + " leaved chat. You will be connected with another agent.";
+        sendToClient(new Message(MessageType.TEXT_MESSAGE, strMessage, serverName));
+        logger.info("Agent " + agent.getName() + " and client " + client.getName() + " finished chat.");
+        agent = null;
+        usersStorage.addConnectionInQueue(Connection.this);
+    }
 
-	public void sendBufferedMessages() throws IOException {
-		while (!bufferedMessages.isEmpty()) {
-			agent.getOutStream().writeObject(bufferedMessages.poll());
-		}
-	}
+    public void setAgent(Agent agent) {
+        this.agent = agent;
+    }
 
-	private synchronized void sendToAgent(Message message) throws IOException {
-		agent.getOutStream().writeObject(message);
-	}
+    public boolean isConnected() {
+        return isConnected;
+    }
 
-	private synchronized void sendToClient(Message message) throws IOException {
-		client.getOutStream().writeObject(message);
-	}
+    public void handShake() throws IOException {
+        sendToClient(new Message(MessageType.TEXT_MESSAGE, "You are sent to agent " + agent.getName(), serverName));
+        sendToAgent(new Message(MessageType.TEXT_MESSAGE, "Client " + client.getName() + " sent to you.", serverName));
+        logger.info("Agent " + agent.getName() + " and client " + client.getName() + " started chat.");
+    }
+
+    public void sendBufferedMessages() throws IOException {
+        while (!bufferedMessages.isEmpty()) {
+            sendToAgent(bufferedMessages.poll());
+        }
+    }
+
+    private synchronized void sendToAgent(Message message) throws IOException {
+        agent.getOutStream().writeObject(message);
+        agent.getOutStream().flush();
+    }
+
+    private synchronized void sendToClient(Message message) throws IOException {
+        client.getOutStream().writeObject(message);
+        client.getOutStream().flush();
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setLogger(Logger logger) {
+        this.logger = logger;
+    }
 }

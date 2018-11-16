@@ -3,5 +3,38 @@
   <groupId>Chat</groupId>
   <artifactId>Chat</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>Chat</name>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>7</source>
+                    <target>7</target>
+                </configuration>
+            </plugin>s
+        </plugins>
+    </build>
+    <name>Chat</name>
+  
+  <dependencies>
+	 <dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-api</artifactId>
+       <version>1.7.25</version>
+   </dependency>
+      <!-- https://mvnrepository.com/artifact/junit/junit -->
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.12</version>
+          <scope>test</scope>
+      </dependency>
+
+      <dependency>
+       <groupId>org.slf4j</groupId>
+       <artifactId>slf4j-log4j12</artifactId>
+       <version>1.7.25</version>
+   </dependency>
+   </dependencies>
 </project>
