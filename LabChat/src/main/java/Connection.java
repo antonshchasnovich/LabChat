@@ -28,6 +28,7 @@ public class Connection extends Thread {
 
     // client-agent thread
     @Override
+
     public void run() {
         while (isConnected) {
             try {
@@ -112,6 +113,11 @@ public class Connection extends Thread {
         agent = null;
         usersStorage.addConnectionInQueue(Connection.this);
     }
+
+    public Agent getAgent() {
+        return agent;
+    }
+
 
     public void setAgent(Agent agent) {
         this.agent = agent;

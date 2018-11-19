@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 public class UsersStorage {
     private final ConcurrentLinkedQueue<Agent> unemployedAgents = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<Connection> connections = new ConcurrentLinkedQueue<>();
-    private final ExecutorService pool = Executors.newFixedThreadPool(100);
+    private ExecutorService pool = Executors.newFixedThreadPool(100);
 
     public synchronized void addAgentInQueue(Agent agent) {
         if (!connections.isEmpty()) {
@@ -48,5 +48,9 @@ public class UsersStorage {
 
     public ExecutorService getPool(){
         return pool;
+    }
+
+    public void setPool(ExecutorService pool) {
+        this.pool = pool;
     }
 }

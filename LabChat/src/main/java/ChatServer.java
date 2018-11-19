@@ -17,7 +17,10 @@ public class ChatServer {
 	private static final String SERVER_NAME = "Server";
 	private final UsersStorage usersStorage = new UsersStorage();
 	private final Logger logger = LoggerFactory.getLogger(ChatServer.class);
-	private ServerSocket serverSocket;
+	private Message regMessage;
+	private Socket socket;
+	private ObjectOutputStream socketOutStream;
+	private ObjectInputStream socketInStream;
 
 	public static void main(String[] args) {
 		ChatServer chatServer = new ChatServer();
@@ -29,27 +32,24 @@ public class ChatServer {
 	}
 
 	private void start() throws IOException, ClassNotFoundException {
-		serverSocket = new ServerSocket(PORT);
+		ServerSocket serverSocket = new ServerSocket(PORT);
 		System.out.println("Server started...");
 		while (true) {
-			Socket socket = serverSocket.accept();
-			registerUser(socket);
+			socket = serverSocket.accept();
+			initStreams();
+			getMessageFromUser();
+			registerUser();
 		}
 	}
 
-	private void registerUser(Socket socket) throws IOException, ClassNotFoundException {
-		ObjectOutputStream socketOutStream = new ObjectOutputStream(socket.getOutputStream());
-		ObjectInputStream socketInStream = new ObjectInputStream(socket.getInputStream());
-		Message regMessage = (Message) socketInStream.readObject();
+	void registerUser() throws IOException {
 		if (regMessage.getType().equals(MessageType.AGENT_REG_MESSAGE)) {
 			logger.info("Agent " + regMessage.getSender() + " registered.");
-			socketOutStream.writeObject(new Message(MessageType.TEXT_MESSAGE, "You are registered like agent.", SERVER_NAME));
-			socketOutStream.flush();
+			sendMessageToUser(new Message(MessageType.TEXT_MESSAGE, "You are registered like agent.", SERVER_NAME));
 			usersStorage.addAgentInQueue(new Agent(regMessage.getSender(), socket, socketInStream, socketOutStream));
 		} else if (regMessage.getType().equals(MessageType.CLIENT_REG_MESSAGE)) {
 			logger.info("Client " + regMessage.getSender() + " registered.");
-			socketOutStream.writeObject(new Message(MessageType.TEXT_MESSAGE, "You are registered like client.", SERVER_NAME));
-			socketOutStream.flush();
+			sendMessageToUser(new Message(MessageType.TEXT_MESSAGE, "You are registered like client.", SERVER_NAME));
 			Connection c = new Connection(usersStorage, new Client(regMessage.getSender(), socket, socketInStream, socketOutStream), SERVER_NAME);
 			c.setServerName(SERVER_NAME);
 			c.setLogger(logger);
@@ -57,11 +57,37 @@ public class ChatServer {
 		}
 	}
 
-	public String getServerName() {
-		return SERVER_NAME;
+	void getMessageFromUser() throws IOException, ClassNotFoundException{
+		regMessage = (Message) socketInStream.readObject();
 	}
 
-	public Logger getLogger() {
-		return logger;
+	void sendMessageToUser(Message message) throws IOException {
+		socketOutStream.writeObject(message);
+		socketOutStream.flush();
+	}
+
+	private void initStreams() throws IOException {
+		socketOutStream = new ObjectOutputStream(socket.getOutputStream());
+		socketInStream = new ObjectInputStream(socket.getInputStream());
+	}
+
+	UsersStorage getUsersStorage() {
+		return usersStorage;
+	}
+
+	void setRegMessage(Message regMessage) {
+		this.regMessage = regMessage;
+	}
+
+	void setSocketOutStream(ObjectOutputStream socketOutStream) {
+		this.socketOutStream = socketOutStream;
+	}
+
+	void setSocketInStream(ObjectInputStream socketInStream) {
+		this.socketInStream = socketInStream;
+	}
+
+	Message getRegMessage() {
+		return regMessage;
 	}
 }
