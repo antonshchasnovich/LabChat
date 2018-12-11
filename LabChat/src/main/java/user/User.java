@@ -1,53 +1,66 @@
 package user;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
+import message.Message;
+
+import javax.websocket.EncodeException;
+import javax.websocket.Session;
+import java.io.IOException;
 import java.util.Objects;
 
 public class User {
-	private final String name;
-	private final Socket socket;
-	private final ObjectInputStream inStream;
-	private final ObjectOutputStream outStream;
+    private final Session session;
+    private final String name;
+    private User companion;
 
-	public User(String name, Socket socket, ObjectInputStream inStream, ObjectOutputStream outStream) {
-		this.name = name;
-		this.socket = socket;
-		this.outStream = outStream;
-		this.inStream = inStream;
-	}
+    public User(Session session, String name) {
+        this.session = session;
+        this.name = name;
+        companion = null;
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		User user = (User) o;
-		return Objects.equals(name, user.name) &&
-				Objects.equals(socket, user.socket) &&
-				Objects.equals(inStream, user.inStream) &&
-				Objects.equals(outStream, user.outStream);
-	}
+    }
 
-	@Override
-	public int hashCode() {
+    public void sendMessage(Message message) throws IOException, EncodeException {
+        session.getBasicRemote().sendObject(message);
+    }
 
-		return Objects.hash(name, socket, inStream, outStream);
-	}
+    public void sendMessageToCompanion(Message message) throws IOException, EncodeException {
+        if (companion!=null){
+            sendMessage(message);
+            companion.sendMessage(message);}
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setCompanion(User user){
+        companion = user;
+    }
 
-	public ObjectOutputStream getOutStream() {
-		return outStream;
-	}
+    public void removeCompanion(){
+        companion = null;
+    }
 
-	public ObjectInputStream getInStream() {
-		return inStream;
-	}
+    public Session getSession() {
+        return session;
+    }
 
-	public Socket getSocket() {
-		return socket;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public User getCompanion() {
+        return companion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(session, user.session) &&
+                Objects.equals(name, user.name);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(session, name);
+    }
 }

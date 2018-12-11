@@ -1,64 +1,31 @@
 package message;
 
-import java.io.Serializable;
-import java.util.Objects;
+import lombok.Builder;
+import lombok.Data;
 
-/**
- * Класс для описания сообщения
- */
+@Data
+@Builder
+public class Message {
+    private String name;
+    private String text;
 
-public class Message implements Serializable {
-	private static final long serialVersionUID = 1L;
-	private MessageType type;
-	private String text;
-	private String sender;
+    private MessageType type;
 
-	public Message(MessageType type, String text, String sender) {
-		this.type = type;
-		this.text = text;
-		this.sender = sender;
-	}
+    public Message(String name, String text, MessageType type) {
+        this.name = name;
+        this.text = text;
+        this.type = type;
+    }
 
-	public Message(MessageType type) {
-		this.type = type;
-		text = null;
-		sender = null;
-	}
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		Message message = (Message) o;
-		return type == message.type &&
-				Objects.equals(text, message.text) &&
-				Objects.equals(sender, message.sender);
-	}
+    public String getText() {
+        return text;
+    }
 
-	@Override
-	public String toString() {
-		return "Message{" +
-				"type=" + type +
-				", text='" + text + '\'' +
-				", sender='" + sender + '\'' +
-				'}';
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(type, text, sender);
-	}
-
-	public MessageType getType() {
-		return type;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public String getSender() {
-		return sender;
-	}
-
+    public MessageType getType() {
+        return type;
+    }
 }
