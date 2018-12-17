@@ -26,7 +26,7 @@ public class ChatEndpoint {
 
     @OnOpen
     public void onOpen(Session session) throws IOException, EncodeException {
-        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "Сonnection established.", MessageType.TEXT_MESSAGE));
+        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "Сonnection established.", MessageType.SERVER_MESSAGE));
     }
 
     @OnClose
@@ -48,7 +48,7 @@ public class ChatEndpoint {
       else if(msg.getType() == MessageType.AGENT_REG_MESSAGE){
           session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
           logger.info("Agent " + msg.getName() + " registered.");
-          storage.addAgent(new Agent(session, msg.getName()));
+          storage.addAgent(new Agent(session, msg.getName(), msg.getIndex()));
       }
       else if(msg.getType() == MessageType.CLIENT_REG_MESSAGE){
           session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
@@ -56,7 +56,8 @@ public class ChatEndpoint {
           storage.addClient(new Client(session, msg.getName()));
       }
       else if(msg.getType() == MessageType.LEAVE_MESSAGE){
-          storage.leaveChat(session);
+          session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE, msg.getIndex()));
+          storage.leaveChat(session, msg.getIndex());
       }
     }
 }

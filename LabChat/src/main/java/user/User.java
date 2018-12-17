@@ -10,13 +10,18 @@ import java.util.Objects;
 public class User {
     private final Session session;
     private final String name;
-    private User companion;
+    private User[] companions;
 
     public User(Session session, String name) {
         this.session = session;
         this.name = name;
-        companion = null;
+        companions = new User[1];
+    }
 
+    public User(Session session, String name, int companionsNumber) {
+        this.session = session;
+        this.name = name;
+        companions = new User[companionsNumber];
     }
 
     public void sendMessage(Message message) throws IOException, EncodeException {
@@ -24,17 +29,20 @@ public class User {
     }
 
     public void sendMessageToCompanion(Message message) throws IOException, EncodeException {
-        if (companion!=null){
-            sendMessage(message);
-            companion.sendMessage(message);}
     }
 
-    public void setCompanion(User user){
-        companion = user;
+    public int setCompanion(User user){
+        for (int i = 0; i < companions.length; i++) {
+            if (companions[i]==null) {
+                companions[i] = user;
+                return i;
+            }
+        }
+        return -1;
     }
 
-    public void removeCompanion(){
-        companion = null;
+    public void removeCompanion(int index){
+        companions[index] = null;
     }
 
     public Session getSession() {
@@ -45,8 +53,8 @@ public class User {
         return name;
     }
 
-    public User getCompanion() {
-        return companion;
+    public User getCompanion(int index) {
+        return companions[index];
     }
 
     @Override
@@ -60,7 +68,17 @@ public class User {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(session, name);
+    }
+
+    public boolean isReady(){
+        for (User companion:companions
+             ) {if (companion == null)return true;
+        }
+        return false;
+    }
+
+    public int getCompanionsNumber() {
+        return companions.length;
     }
 }
