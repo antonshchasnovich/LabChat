@@ -13,7 +13,11 @@
     overflow-y: auto; /* Добавляем полосы прокрутки */
     width: 450px; /* Ширина блока */
     max-width: 500px;
+<<<<<<< HEAD
     height: 500px; /* Высота блока */
+=======
+    height: 600px; /* Высота блока */
+>>>>>>> a320b3f934dcfea8c98642a9c6edc497976d1551
     padding: 5px; /* Поля вокруг текста */
     border: solid 1px black; /* Параметры рамки */
    } 
