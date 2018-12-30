@@ -14,13 +14,8 @@ public class SessionsStorage {
     private Logger logger;
     private final String serverName;
     private final HashMap<Session, User> allUsers = new HashMap<>();
-<<<<<<< HEAD
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
-=======
-    private final ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
-    private final ArrayDeque<Client> waitingClients = new ArrayDeque<>();
->>>>>>> a320b3f934dcfea8c98642a9c6edc497976d1551
 
     public SessionsStorage(String serverName) {
         this.serverName = serverName;
@@ -132,7 +127,6 @@ public class SessionsStorage {
     public void setLogger(Logger logger) {
         this.logger = logger;
     }
-<<<<<<< HEAD
 
     public void setFreeAgents(ArrayDeque<Agent> freeAgents) {
         this.freeAgents = freeAgents;
@@ -157,6 +151,4 @@ public class SessionsStorage {
     public ArrayDeque<Client> getWaitingClients() {
         return waitingClients;
     }
-=======
->>>>>>> a320b3f934dcfea8c98642a9c6edc497976d1551
 }
