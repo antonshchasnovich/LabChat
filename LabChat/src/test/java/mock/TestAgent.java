@@ -8,15 +8,15 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class testAgent extends Agent {
+public class TestAgent extends Agent {
     ArrayList<Message> receivedMessages = new ArrayList<>();
 
 
-    public testAgent(Session session, String name) {
+    public TestAgent(Session session, String name) {
         super(session, name);
     }
 
-    public testAgent(Session session, String name, int companionsNumber) {
+    public TestAgent(Session session, String name, int companionsNumber) {
         super(session, name, companionsNumber);
     }
 

@@ -8,14 +8,14 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class testClient extends Client {
+public class TestClient extends Client {
     ArrayList<Message> receivedMessages = new ArrayList<>();
 
-    public testClient(Session session, String name) {
+    public TestClient(Session session, String name) {
         super(session, name);
     }
 
-    public testClient(Session session, String name, int companionsNumber) {
+    public TestClient(Session session, String name, int companionsNumber) {
         super(session, name, companionsNumber);
     }
 

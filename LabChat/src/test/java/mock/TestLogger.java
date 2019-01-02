@@ -5,7 +5,7 @@ import org.slf4j.Marker;
 
 import java.util.ArrayList;
 
-public class testLogger implements Logger {
+public class TestLogger implements Logger {
     ArrayList<String> infoLoggies = new ArrayList<>();
 
     @Override

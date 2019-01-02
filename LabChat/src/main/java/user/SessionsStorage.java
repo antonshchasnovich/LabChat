@@ -3,6 +3,7 @@ package user;
 import message.Message;
 import message.MessageType;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
@@ -11,14 +12,25 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 
 public class SessionsStorage {
-    private Logger logger;
-    private final String serverName;
+    private static Logger logger = LoggerFactory.getLogger(SessionsStorage.class);
+    private final static String SERVER_NAME = "Server";
     private final HashMap<Session, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
 
-    public SessionsStorage(String serverName) {
-        this.serverName = serverName;
+    public SessionsStorage() {
+    }
+
+    public void regAgent(Session session, Message msg) throws IOException, EncodeException {
+        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
+        logger.info("Agent " + msg.getName() + " registered.");
+        addAgent(new Agent(session, msg.getName(), msg.getIndex()));
+    }
+
+    public void regClient(Session session, Message msg) throws IOException, EncodeException {
+        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
+        logger.info("Client " + msg.getName() + " registered.");
+        addClient(new Client(session, msg.getName()));
     }
 
     public synchronized void addAgent(Agent agent) throws IOException, EncodeException {
@@ -41,7 +53,8 @@ public class SessionsStorage {
         allUsers.put(client.getSession(), client);
         if (freeAgents.isEmpty()) {
             waitingClients.addLast(client);
-            client.sendMessage(new Message(serverName, "There are no free agents now. Please wait...", MessageType.SERVER_MESSAGE));
+            client.sendMessage(new Message(SERVER_NAME, "There are no free agents now. Please wait...",
+                    MessageType.SERVER_MESSAGE));
         } else {
             Agent agent = freeAgents.poll();
             int index = agent.setCompanion(client);
@@ -64,7 +77,10 @@ public class SessionsStorage {
         user.sendMessageToCompanion(message);
     }
 
-    public void leaveChat(Session session, int index) throws IOException, EncodeException {
+    public void leaveChat(Session session, Message msg) throws IOException, EncodeException {
+        int index = msg.getIndex();
+        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
+                index));
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
         disconnect(session, index);
@@ -102,11 +118,13 @@ public class SessionsStorage {
         User companion = user.getCompanion(index);
         if(companion != null && user instanceof Client){
             logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
-            companion.sendMessage(new Message(serverName, "Client " + user.getName() + " lived chat.", MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
+            companion.sendMessage(new Message(SERVER_NAME, "Client " + user.getName() + " lived chat.",
+                    MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
             companion.removeCompanion(((Client) user).getIndex());
             user.removeCompanion(index);
         }else if(companion != null && user instanceof Agent){
-            companion.sendMessage(new Message(serverName, "Agent " + user.getName() + " lived chat. You will be sended to another agent.", MessageType.SERVER_MESSAGE));
+            companion.sendMessage(new Message(SERVER_NAME, "Agent " + user.getName() + " lived chat. You will be sended to " +
+                    "another agent.", MessageType.SERVER_MESSAGE));
             logger.info("Agent " + user.getName() + " and client " + companion.getName() + " finished chat.");
             companion.removeCompanion(0);
             user.removeCompanion(index);
@@ -114,8 +132,9 @@ public class SessionsStorage {
     }
 
     private void handshake(Agent agent, Client client) throws IOException, EncodeException {
-        agent.sendMessage(new Message(serverName, "Client " + client.getName() + " sended to you.", MessageType.SERVER_MESSAGE, client.getIndex()));
-        client.sendMessage(new Message(serverName, "You sended to agent " + agent.getName(), MessageType.SERVER_MESSAGE));
+        agent.sendMessage(new Message(SERVER_NAME, "Client " + client.getName() + " sended to you.", MessageType.SERVER_MESSAGE
+                , client.getIndex()));
+        client.sendMessage(new Message(SERVER_NAME, "You sended to agent " + agent.getName(), MessageType.SERVER_MESSAGE));
         logger.info("Agent " + agent.getName() + " and client " + client.getName() + " started chat.");
         if (!client.getHistory().isEmpty()){
             client.sendHistory();

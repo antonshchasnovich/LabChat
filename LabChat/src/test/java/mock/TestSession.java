@@ -8,7 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class testSession implements Session {
+public class TestSession implements Session {
+    private TestBasic basic = new TestBasic();
+
+    @Override
+    public RemoteEndpoint.Basic getBasicRemote() {
+        return basic;
+    }
+
     @Override
     public WebSocketContainer getContainer() {
         return null;
@@ -96,11 +103,6 @@ public class testSession implements Session {
 
     @Override
     public RemoteEndpoint.Async getAsyncRemote() {
-        return null;
-    }
-
-    @Override
-    public RemoteEndpoint.Basic getBasicRemote() {
         return null;
     }
 

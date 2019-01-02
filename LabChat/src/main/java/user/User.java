@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public abstract class User {
-    private final Session session;
+    private Session session;
     private final String name;
     private User[] companions;
 
@@ -79,5 +79,9 @@ public abstract class User {
 
     public int getCompanionsNumber() {
         return companions.length;
+    }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 }
