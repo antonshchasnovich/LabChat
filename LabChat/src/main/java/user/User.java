@@ -7,7 +7,7 @@ import javax.websocket.Session;
 import java.io.IOException;
 import java.util.Objects;
 
-public class User {
+public abstract class User {
     private final Session session;
     private final String name;
     private User[] companions;
@@ -28,8 +28,7 @@ public class User {
         session.getBasicRemote().sendObject(message);
     }
 
-    public void sendMessageToCompanion(Message message) throws IOException, EncodeException {
-    }
+    public abstract void sendMessageToCompanion(Message message) throws IOException, EncodeException;
 
     public int setCompanion(User user){
         for (int i = 0; i < companions.length; i++) {
