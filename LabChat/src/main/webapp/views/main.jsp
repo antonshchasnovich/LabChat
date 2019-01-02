@@ -13,11 +13,7 @@
     overflow-y: auto; /* Добавляем полосы прокрутки */
     width: 450px; /* Ширина блока */
     max-width: 500px;
-<<<<<<< HEAD
-    height: 500px; /* Высота блока */
-=======
-    height: 600px; /* Высота блока */
->>>>>>> a320b3f934dcfea8c98642a9c6edc497976d1551
+    height:450px;/* Высота блока */
     padding: 5px; /* Поля вокруг текста */
     border: solid 1px black; /* Параметры рамки */
    } 
@@ -212,6 +208,7 @@
       <div class="buttons2">
         <div class="messages"></div>
         <button class="leaveButton">leave</button>
+          <p>Press Ctrl + Enter for sending a message</p>
         </div>
        <textarea class="msg">     
         </textarea>  
