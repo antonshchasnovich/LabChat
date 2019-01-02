@@ -28,6 +28,7 @@ public class ChatEndpoint {
 
     @OnError
     public void onError(Session session, Throwable throwable) throws IOException, EncodeException {
+        storage.getLogger().error(String.valueOf(throwable));
         session.close();
     }
 

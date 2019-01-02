@@ -12,7 +12,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 
 public class SessionsStorage {
-    private static Logger logger = LoggerFactory.getLogger(SessionsStorage.class);
+    private Logger logger = LoggerFactory.getLogger(SessionsStorage.class);
     private final static String SERVER_NAME = "Server";
     private final HashMap<Session, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
@@ -170,4 +170,6 @@ public class SessionsStorage {
     public ArrayDeque<Client> getWaitingClients() {
         return waitingClients;
     }
+
+
 }
