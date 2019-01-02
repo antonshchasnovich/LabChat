@@ -73,13 +73,10 @@ public class Client extends User {
         return history;
     }
 
-<<<<<<< HEAD
     public ArrayList<Message> getBufferedMessages() {
         return bufferedMessages;
     }
 
-=======
->>>>>>> a320b3f934dcfea8c98642a9c6edc497976d1551
     public int getIndex() {
         return index;
     }
