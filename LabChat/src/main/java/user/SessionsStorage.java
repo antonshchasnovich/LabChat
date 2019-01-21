@@ -83,7 +83,6 @@ public class SessionsStorage {
             User companion = user.getCompanion(index);
             disconnect(session, index);
             if(user instanceof Client){
-                companion.removeCompanion(((Client) user).getIndex());
                 addAgent((Agent)companion);
             }else if(user instanceof Agent){
                 addClient((Client) companion);
