@@ -86,11 +86,7 @@ public abstract class User {
         this.session = session;
     }
 
-    public boolean isChatting() {
-        for (User companion : companions
-        ) {
-            if (companion != null) return true;
-        }
-        return false;
+    public boolean isChatting(int index) {
+        return companions[index] != null;
     }
 }
