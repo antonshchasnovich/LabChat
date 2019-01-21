@@ -2,8 +2,6 @@ package coders;
 
 import com.google.gson.Gson;
 import message.Message;
-
-import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 

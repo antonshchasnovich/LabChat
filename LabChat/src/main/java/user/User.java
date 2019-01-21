@@ -12,13 +12,13 @@ public abstract class User {
     private final String name;
     private User[] companions;
 
-    public User(Session session, String name) {
+    User(Session session, String name) {
         this.session = session;
         this.name = name;
         companions = new User[1];
     }
 
-    public User(Session session, String name, int companionsNumber) {
+    User(Session session, String name, int companionsNumber) {
         this(session, name);
         companions = new User[companionsNumber];
     }
@@ -29,7 +29,7 @@ public abstract class User {
 
     public abstract void sendMessageToCompanion(Message message) throws IOException, EncodeException;
 
-    public int setCompanion(User user) {
+    int setCompanion(User user) {
         for (int i = 0; i < companions.length; i++) {
             if (companions[i] == null) {
                 companions[i] = user;
@@ -39,19 +39,19 @@ public abstract class User {
         return -1;
     }
 
-    public void removeCompanion(int index) {
+    void removeCompanion(int index) {
         companions[index] = null;
     }
 
-    public Session getSession() {
+    Session getSession() {
         return session;
     }
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
-    public User getCompanion(int index) {
+    User getCompanion(int index) {
         return companions[index];
     }
 
@@ -69,7 +69,7 @@ public abstract class User {
         return Objects.hash(session, name);
     }
 
-    public boolean isReady() {
+    boolean isReady() {
         for (User companion : companions
         ) {
             if (companion == null) return true;
@@ -77,15 +77,15 @@ public abstract class User {
         return false;
     }
 
-    public int getCompanionsNumber() {
+    int getCompanionsNumber() {
         return companions.length;
     }
 
-    public void setSession(Session session) {
+    void setSession(Session session) {
         this.session = session;
     }
 
-    public boolean isChatting(int index) {
+    boolean isChatting(int index) {
         return companions[index] != null;
     }
 }

@@ -30,7 +30,7 @@ public class SessionsStorage {
         addClient(new Client(session, msg.getName()));
     }
 
-    public synchronized void addAgent(Agent agent) throws IOException, EncodeException {
+    synchronized void addAgent(Agent agent) throws IOException, EncodeException {
         allUsers.put(agent.getSession(), agent);
         if (waitingClients.isEmpty()) {
             freeAgents.addLast(agent);
@@ -46,7 +46,7 @@ public class SessionsStorage {
         }
     }
 
-    public synchronized void addClient(Client client) throws IOException, EncodeException {
+    synchronized void addClient(Client client) throws IOException, EncodeException {
         allUsers.put(client.getSession(), client);
         if (freeAgents.isEmpty()) {
             waitingClients.addLast(client);
@@ -141,15 +141,15 @@ public class SessionsStorage {
     }
 
 
-    public void setLogger(Logger logger) {
+    void setLogger(Logger logger) {
         this.logger = logger;
     }
 
-    public void setFreeAgents(ArrayDeque<Agent> freeAgents) {
+    void setFreeAgents(ArrayDeque<Agent> freeAgents) {
         this.freeAgents = freeAgents;
     }
 
-    public void setWaitingClients(ArrayDeque<Client> waitingClients) {
+    void setWaitingClients(ArrayDeque<Client> waitingClients) {
         this.waitingClients = waitingClients;
     }
 
@@ -157,15 +157,15 @@ public class SessionsStorage {
         return logger;
     }
 
-    public HashMap<Session, User> getAllUsers() {
+    HashMap<Session, User> getAllUsers() {
         return allUsers;
     }
 
-    public ArrayDeque<Agent> getFreeAgents() {
+    ArrayDeque<Agent> getFreeAgents() {
         return freeAgents;
     }
 
-    public ArrayDeque<Client> getWaitingClients() {
+    ArrayDeque<Client> getWaitingClients() {
         return waitingClients;
     }
 

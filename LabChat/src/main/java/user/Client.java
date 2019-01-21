@@ -44,7 +44,7 @@ public class Client extends User {
         }
     }
 
-    public void sendBufferedMessages() throws IOException, EncodeException {
+    void sendBufferedMessages() throws IOException, EncodeException {
         for (Message message:bufferedMessages
              ) {
             message.setType(MessageType.TEXT_MESSAGE);
@@ -54,7 +54,7 @@ public class Client extends User {
         bufferedMessages.clear();
     }
 
-    public void sendHistory() throws IOException, EncodeException {
+    void sendHistory() throws IOException, EncodeException {
         sendMessageToCompanion(new Message("Message History", "", MessageType.HISTORY_MESSAGE));
         sendMessageToCompanion(new Message(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", "", MessageType.HISTORY_MESSAGE));
         for (Message message: history
@@ -65,19 +65,19 @@ public class Client extends User {
         sendMessageToCompanion(new Message(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::", "", MessageType.HISTORY_MESSAGE));
     }
 
-    public ArrayList<Message> getHistory() {
+    ArrayList<Message> getHistory() {
         return history;
     }
 
-    public ArrayList<Message> getBufferedMessages() {
+    ArrayList<Message> getBufferedMessages() {
         return bufferedMessages;
     }
 
-    public int getIndex() {
+    int getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
+    void setIndex(int index) {
         this.index = index;
     }
 }
