@@ -18,9 +18,6 @@ public class SessionsStorage {
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
 
-    public SessionsStorage() {
-    }
-
     public void regAgent(Session session, Message msg) throws IOException, EncodeException {
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
         logger.info("Agent " + msg.getName() + " registered.");
