@@ -30,9 +30,9 @@ public abstract class User {
 
     public abstract void sendMessageToCompanion(Message message) throws IOException, EncodeException;
 
-    public int setCompanion(User user){
+    public int setCompanion(User user) {
         for (int i = 0; i < companions.length; i++) {
-            if (companions[i]==null) {
+            if (companions[i] == null) {
                 companions[i] = user;
                 return i;
             }
@@ -40,7 +40,7 @@ public abstract class User {
         return -1;
     }
 
-    public void removeCompanion(int index){
+    public void removeCompanion(int index) {
         companions[index] = null;
     }
 
@@ -70,9 +70,10 @@ public abstract class User {
         return Objects.hash(session, name);
     }
 
-    public boolean isReady(){
-        for (User companion:companions
-             ) {if (companion == null)return true;
+    public boolean isReady() {
+        for (User companion : companions
+        ) {
+            if (companion == null) return true;
         }
         return false;
     }
@@ -83,5 +84,13 @@ public abstract class User {
 
     public void setSession(Session session) {
         this.session = session;
+    }
+
+    public boolean isChatting() {
+        for (User companion : companions
+        ) {
+            if (companion != null) return true;
+        }
+        return false;
     }
 }
