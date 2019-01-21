@@ -6,6 +6,7 @@ import message.Message;
 import message.MessageType;
 import user.SessionsStorage;
 
+
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
@@ -16,36 +17,52 @@ public class ChatEndpoint {
 
 
     @OnOpen
-    public void onOpen(Session session) throws IOException, EncodeException {
-        session.getBasicRemote().sendObject(new Message("Server", "Сonnection established.",
-                MessageType.SERVER_MESSAGE));
+    public void onOpen(Session session) {
+        try {
+            session.getBasicRemote().sendObject(new Message("Server", "Сonnection established.",
+                    MessageType.SERVER_MESSAGE));
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
     }
 
     @OnClose
-    public void onClose(Session session) throws IOException, EncodeException {
-        storage.exitChat(session);
+    public void onClose(Session session) {
+        try {
+            storage.exitChat(session);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
     }
 
     @OnError
-    public void onError(Session session, Throwable throwable) throws IOException, EncodeException {
-        storage.getLogger().error(String.valueOf(throwable));
-        session.close();
+    public void onError(Session session, Throwable throwable) {
+        storage.getLogger().error("", throwable);
+        try {
+            session.close();
+        } catch (IOException e) {
+            storage.getLogger().error("", e);
+        }
     }
 
     @OnMessage
-    public void onMessage(Session session, Message msg) throws IOException, EncodeException {
+    public void onMessage(Session session, Message msg) {
 
-      if(msg.getType() == MessageType.TEXT_MESSAGE){
-          storage.sendMessage(session, msg);
-      }
-      else if(msg.getType() == MessageType.AGENT_REG_MESSAGE){
-          storage.regAgent(session, msg);
-      }
-      else if(msg.getType() == MessageType.CLIENT_REG_MESSAGE){
-          storage.regClient(session, msg);
-      }
-      else if(msg.getType() == MessageType.LEAVE_MESSAGE){
-          storage.leaveChat(session, msg);
+      try {
+          if(msg.getType() == MessageType.TEXT_MESSAGE){
+              storage.sendMessage(session, msg);
+          }
+          else if(msg.getType() == MessageType.AGENT_REG_MESSAGE){
+              storage.regAgent(session, msg);
+          }
+          else if(msg.getType() == MessageType.CLIENT_REG_MESSAGE){
+              storage.regClient(session, msg);
+          }
+          else if(msg.getType() == MessageType.LEAVE_MESSAGE){
+              storage.leaveChat(session, msg);
+          }
+      }catch (IOException | EncodeException e){
+          storage.getLogger().error("", e);
       }
     }
 }
