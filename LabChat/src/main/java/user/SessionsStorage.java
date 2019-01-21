@@ -78,18 +78,20 @@ public class SessionsStorage {
     }
 
     public void leaveChat(Session session, Message msg) throws IOException, EncodeException {
-        int index = msg.getIndex();
-        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
-                index));
-        User user = allUsers.get(session);
-        User companion = user.getCompanion(index);
-        disconnect(session, index);
-        if(user instanceof Client){
-            companion.removeCompanion(((Client) user).getIndex());
-            addAgent((Agent)companion);
-        }else if(user instanceof Agent){
-            addClient((Client) companion);
-            addAgent((Agent)user);
+            int index = msg.getIndex();
+        if(allUsers.get(session).isChatting(index)){
+            session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
+                    index));
+            User user = allUsers.get(session);
+            User companion = user.getCompanion(index);
+            disconnect(session, index);
+            if(user instanceof Client){
+                companion.removeCompanion(((Client) user).getIndex());
+                addAgent((Agent)companion);
+            }else if(user instanceof Agent){
+                addClient((Client) companion);
+                addAgent((Agent)user);
+            }
         }
     }
 
