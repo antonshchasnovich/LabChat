@@ -11,29 +11,22 @@ public class Message {
     private String name;
     private String text;
     private MessageType type;
-    private int index;
+    private int index = 0;
 
 
     public Message(String name, String text, MessageType type) {
         this.name = name;
         this.text = text;
         this.type = type;
-        this.index = 0;
     }
 
     public Message(String name, String text, MessageType type, int index) {
-        this.name = name;
-        this.text = text;
-        this.type = type;
+        this(name, text, type);
         this.index = index;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getText() {
-        return text;
     }
 
     public MessageType getType() {
