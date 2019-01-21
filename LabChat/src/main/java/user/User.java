@@ -19,8 +19,7 @@ public abstract class User {
     }
 
     public User(Session session, String name, int companionsNumber) {
-        this.session = session;
-        this.name = name;
+        this(session, name);
         companions = new User[companionsNumber];
     }
 
