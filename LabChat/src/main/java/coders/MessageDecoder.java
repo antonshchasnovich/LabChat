@@ -11,7 +11,7 @@ public class MessageDecoder implements Decoder.Text<Message> {
     private static Gson gson = new Gson();
 
     @Override
-    public Message decode(String s) throws DecodeException {
+    public Message decode(String s) {
         return gson.fromJson(s, Message.class);
     }
 
