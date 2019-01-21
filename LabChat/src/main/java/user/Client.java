@@ -9,20 +9,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Client extends User {
-    private ArrayList<Message> history;
-    private ArrayList<Message> bufferedMessages;
+    private ArrayList<Message> history = new ArrayList<>();;
+    private ArrayList<Message> bufferedMessages = new ArrayList<>();;
     private int index;
 
     public Client(Session session, String name) {
         super(session, name);
-        history = new ArrayList<>();
-        bufferedMessages = new ArrayList<>();
     }
 
     public Client(Session session, String name, int companionsNumber) {
         super(session, name, companionsNumber);
-        history = new ArrayList<>();
-        bufferedMessages = new ArrayList<>();
     }
 
     @Override
