@@ -12,15 +12,14 @@ public abstract class User {
     private final String name;
     private User[] companions;
 
-    User(Session session, String name) {
+    User(Session session, String name, int companionsNumber) {
         this.session = session;
         this.name = name;
-        companions = new User[1];
+        companions = new User[companionsNumber];
     }
 
-    User(Session session, String name, int companionsNumber) {
-        this(session, name);
-        companions = new User[companionsNumber];
+    User(Session session, String name) {
+        this(session, name, 1);
     }
 
     public void sendMessage(Message message) throws IOException, EncodeException {
