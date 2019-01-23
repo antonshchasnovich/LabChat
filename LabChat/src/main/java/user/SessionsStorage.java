@@ -19,19 +19,22 @@ public class SessionsStorage {
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
 
     public void regAgent(Session session, Message msg) throws IOException, EncodeException {
+        Agent agent = new Agent(session, msg.getName(), msg.getIndex());
+        allUsers.put(agent.getSession(), agent);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
         logger.info("Agent " + msg.getName() + " registered.");
-        addAgent(new Agent(session, msg.getName(), msg.getIndex()));
+        addAgent(agent);
     }
 
     public void regClient(Session session, Message msg) throws IOException, EncodeException {
+        Client client = new Client(session, msg.getName());
+        allUsers.put(client.getSession(), client);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
         logger.info("Client " + msg.getName() + " registered.");
-        addClient(new Client(session, msg.getName()));
+        addClient(client);
     }
 
     synchronized void addAgent(Agent agent) throws IOException, EncodeException {
-        allUsers.put(agent.getSession(), agent);
         if (waitingClients.isEmpty()) {
             freeAgents.addLast(agent);
         } else {
@@ -41,7 +44,6 @@ public class SessionsStorage {
     }
 
     synchronized void addClient(Client client) throws IOException, EncodeException {
-        allUsers.put(client.getSession(), client);
         if (freeAgents.isEmpty()) {
             waitingClients.addLast(client);
             client.sendMessage(new Message(SERVER_NAME, "There are no free agents now. Please wait...",
