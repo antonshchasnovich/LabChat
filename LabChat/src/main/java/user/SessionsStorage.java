@@ -23,7 +23,7 @@ public class SessionsStorage {
         allUsers.put(agent.getSession(), agent);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
         logger.info("Agent " + msg.getName() + " registered.");
-        addAgent(agent);
+        tryFindCompanion(agent);
     }
 
     public void regClient(Session session, Message msg) throws IOException, EncodeException {
@@ -31,10 +31,10 @@ public class SessionsStorage {
         allUsers.put(client.getSession(), client);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
         logger.info("Client " + msg.getName() + " registered.");
-        addClient(client);
+        tryFindCompanion(client);
     }
 
-    synchronized void addAgent(Agent agent) throws IOException, EncodeException {
+    synchronized void tryFindCompanion(Agent agent) throws IOException, EncodeException {
         if (waitingClients.isEmpty()) {
             freeAgents.addLast(agent);
         } else {
@@ -43,7 +43,7 @@ public class SessionsStorage {
         }
     }
 
-    synchronized void addClient(Client client) throws IOException, EncodeException {
+    synchronized void tryFindCompanion(Client client) throws IOException, EncodeException {
         if (freeAgents.isEmpty()) {
             waitingClients.addLast(client);
             client.sendMessage(new Message(SERVER_NAME, "There are no free agents now. Please wait...",
@@ -60,16 +60,16 @@ public class SessionsStorage {
         client.setIndex(index);
         handshake(agent, client);
         if(agent.isReady()){
-            addAgent(agent);
+            tryFindCompanion(agent);
         }
     }
 
     public void sendMessage(Session session, Message message) throws IOException, EncodeException {
         User user = allUsers.get(session);
          if (user.getCompanion(message.getIndex()) == null && user instanceof Client && !waitingClients.contains(user)) {
-            addClient((Client) user);
+            tryFindCompanion((Client) user);
         } else if (user.getCompanion(message.getIndex()) == null && user instanceof Agent && !freeAgents.contains(user)) {
-            addAgent((Agent) user);
+            tryFindCompanion((Agent) user);
         }
         user.sendMessageToCompanion(message);
     }
@@ -83,10 +83,10 @@ public class SessionsStorage {
             User companion = user.getCompanion(index);
             disconnect(session, index);
             if(user instanceof Client){
-                addAgent((Agent)companion);
+                tryFindCompanion((Agent)companion);
             }else if(user instanceof Agent){
-                addClient((Client) companion);
-                addAgent((Agent)user);
+                tryFindCompanion((Client) companion);
+                tryFindCompanion((Agent)user);
             }
         }
     }
@@ -99,12 +99,12 @@ public class SessionsStorage {
             if (user instanceof Client) {
                 waitingClients.remove(user);
                 if (companion!=null){
-                    addAgent((Agent) companion);
+                    tryFindCompanion((Agent) companion);
                 }
             } else if (user instanceof Agent) {
                 freeAgents.remove(user);
                 if (companion!=null){
-                    addClient((Client) companion);
+                    tryFindCompanion((Client) companion);
                 }
             }
         }
