@@ -168,15 +168,15 @@ public class SessionsStorage {
         return logger;
     }
 
-    HashMap<Session, User> getAllUsers() {
+    public HashMap<Session, User> getAllUsers() {
         return allUsers;
     }
 
-    ArrayDeque<Agent> getFreeAgents() {
+    public ArrayDeque<Agent> getFreeAgents() {
         return freeAgents;
     }
 
-    ArrayDeque<Client> getWaitingClients() {
+    public ArrayDeque<Client> getWaitingClients() {
         return waitingClients;
     }
 
