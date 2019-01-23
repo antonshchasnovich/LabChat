@@ -30,7 +30,7 @@ public class SessionsStorageTest {
     @Before
     public void setUp() throws Exception {
         logger = new TestLogger();
-        storage = new SessionsStorage();
+        storage = SessionsStorage.getInstance();
         storage.setLogger(logger);
         agentSession = new TestSession();
         clientSession = new TestSession();
@@ -62,7 +62,7 @@ public class SessionsStorageTest {
     //if we don't have waiting clients and we add a new agent
     @Test
     public void addAgent1() throws IOException, EncodeException {
-        storage.addAgent(agent);
+        storage.tryFindCompanion(agent);
         Assert.assertEquals(1, storage.getAllUsers().size());
         Assert.assertEquals(agent, storage.getAllUsers().get(agent.getSession()));
         Assert.assertTrue(storage.getFreeAgents().contains(agent));
@@ -76,7 +76,7 @@ public class SessionsStorageTest {
         ArrayDeque<Client> waitingClients = new ArrayDeque<>();
         waitingClients.add(client);
         storage.setWaitingClients(waitingClients);
-        storage.addAgent(agent);
+        storage.tryFindCompanion(agent);
         Assert.assertEquals(1, storage.getAllUsers().size());
         Assert.assertEquals(agent, storage.getAllUsers().get(agent.getSession()));
         Assert.assertEquals(1, storage.getFreeAgents().size());
@@ -91,7 +91,7 @@ public class SessionsStorageTest {
     //if we don't have free agents and we add a new client
     @Test
     public void addClient1() throws IOException, EncodeException {
-        storage.addClient(client);
+        storage.tryFindCompanion(client);
         Assert.assertEquals(1, storage.getAllUsers().size());
         Assert.assertEquals(client, storage.getAllUsers().get(client.getSession()));
         Assert.assertTrue(storage.getWaitingClients().contains(client));
@@ -105,7 +105,7 @@ public class SessionsStorageTest {
         ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
         freeAgents.add(agent);
         storage.setFreeAgents(freeAgents);
-        storage.addClient(client);
+        storage.tryFindCompanion(client);
         Assert.assertEquals(1, storage.getAllUsers().size());
         Assert.assertEquals(client, storage.getAllUsers().get(client.getSession()));
         Assert.assertEquals(1, storage.getFreeAgents().size());
