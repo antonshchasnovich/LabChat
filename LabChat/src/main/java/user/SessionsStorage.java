@@ -12,11 +12,22 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 
 public class SessionsStorage {
+    private static SessionsStorage instance;
     private Logger logger = LoggerFactory.getLogger(SessionsStorage.class);
     private final static String SERVER_NAME = "Server";
     private final HashMap<Session, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
+
+    private SessionsStorage() {
+    }
+
+    public static synchronized SessionsStorage getInstance() {
+        if (instance == null) {
+            instance = new SessionsStorage();
+        }
+        return instance;
+    }
 
     public void regAgent(Session session, Message msg) throws IOException, EncodeException {
         Agent agent = new Agent(session, msg.getName(), msg.getIndex());
@@ -59,14 +70,14 @@ public class SessionsStorage {
         client.setCompanion(agent);
         client.setIndex(index);
         handshake(agent, client);
-        if(agent.isReady()){
+        if (agent.isReady()) {
             tryFindCompanion(agent);
         }
     }
 
     public void sendMessage(Session session, Message message) throws IOException, EncodeException {
         User user = allUsers.get(session);
-         if (user.getCompanion(message.getIndex()) == null && user instanceof Client && !waitingClients.contains(user)) {
+        if (user.getCompanion(message.getIndex()) == null && user instanceof Client && !waitingClients.contains(user)) {
             tryFindCompanion((Client) user);
         } else if (user.getCompanion(message.getIndex()) == null && user instanceof Agent && !freeAgents.contains(user)) {
             tryFindCompanion((Agent) user);
@@ -75,16 +86,16 @@ public class SessionsStorage {
     }
 
     public void leaveChat(Session session, Message msg) throws IOException, EncodeException {
-            int index = msg.getIndex();
-        if(allUsers.get(session).isChatting(index)){
+        int index = msg.getIndex();
+        if (allUsers.get(session).isChatting(index)) {
             User user = allUsers.get(session);
             User companion = user.getCompanion(index);
             disconnect(session, index);
-            if(user instanceof Client){
-                tryFindCompanion((Agent)companion);
-            }else if(user instanceof Agent){
+            if (user instanceof Client) {
+                tryFindCompanion((Agent) companion);
+            } else if (user instanceof Agent) {
                 tryFindCompanion((Client) companion);
-                tryFindCompanion((Agent)user);
+                tryFindCompanion((Agent) user);
             }
         }
     }
@@ -96,12 +107,12 @@ public class SessionsStorage {
             disconnect(session, i);
             if (user instanceof Client) {
                 waitingClients.remove(user);
-                if (companion!=null){
+                if (companion != null) {
                     tryFindCompanion((Agent) companion);
                 }
             } else if (user instanceof Agent) {
                 freeAgents.remove(user);
-                if (companion!=null){
+                if (companion != null) {
                     tryFindCompanion((Client) companion);
                 }
             }
@@ -112,13 +123,13 @@ public class SessionsStorage {
     private void disconnect(Session session, int index) throws IOException, EncodeException {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
-        if(companion != null && user instanceof Client){
+        if (companion != null && user instanceof Client) {
             companion.removeCompanion(((Client) user).getIndex());
             user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Client " + user.getName() + " lived chat.",
                     MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
             logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
-        }else if(companion != null && user instanceof Agent){
+        } else if (companion != null && user instanceof Agent) {
             companion.removeCompanion(0);
             user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Agent " + user.getName() + " lived chat. You will be sended to " +
@@ -134,7 +145,7 @@ public class SessionsStorage {
                 , client.getIndex()));
         client.sendMessage(new Message(SERVER_NAME, "You sended to agent " + agent.getName(), MessageType.SERVER_MESSAGE));
         logger.info("Agent " + agent.getName() + " and client " + client.getName() + " started chat.");
-        if (!client.getHistory().isEmpty()){
+        if (!client.getHistory().isEmpty()) {
             client.sendHistory();
         }
         client.sendBufferedMessages();
