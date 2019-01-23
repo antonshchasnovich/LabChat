@@ -36,13 +36,7 @@ public class SessionsStorage {
             freeAgents.addLast(agent);
         } else {
             Client client = waitingClients.poll();
-            client.setCompanion(agent);
-            int index = agent.setCompanion(client);
-            client.setIndex(index);
-            handshake(agent, client);
-            if(agent.isReady()){
-                addAgent(agent);
-            }
+            createChat(agent, client);
         }
     }
 
@@ -54,13 +48,17 @@ public class SessionsStorage {
                     MessageType.SERVER_MESSAGE));
         } else {
             Agent agent = freeAgents.poll();
-            int index = agent.setCompanion(client);
-            client.setCompanion(agent);
-            client.setIndex(index);
-            handshake(agent, client);
-            if(agent.isReady()){
-                freeAgents.addLast(agent);
-            }
+            createChat(agent, client);
+        }
+    }
+
+    private void createChat(Agent agent, Client client) throws IOException, EncodeException {
+        int index = agent.setCompanion(client);
+        client.setCompanion(agent);
+        client.setIndex(index);
+        handshake(agent, client);
+        if(agent.isReady()){
+            addAgent(agent);
         }
     }
 
