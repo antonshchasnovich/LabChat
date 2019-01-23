@@ -77,8 +77,6 @@ public class SessionsStorage {
     public void leaveChat(Session session, Message msg) throws IOException, EncodeException {
             int index = msg.getIndex();
         if(allUsers.get(session).isChatting(index)){
-            session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
-                    index));
             User user = allUsers.get(session);
             User companion = user.getCompanion(index);
             disconnect(session, index);
@@ -115,18 +113,20 @@ public class SessionsStorage {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
         if(companion != null && user instanceof Client){
-            logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
-            companion.sendMessage(new Message(SERVER_NAME, "Client " + user.getName() + " lived chat.",
-                    MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
             companion.removeCompanion(((Client) user).getIndex());
             user.removeCompanion(index);
+            companion.sendMessage(new Message(SERVER_NAME, "Client " + user.getName() + " lived chat.",
+                    MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
+            logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
         }else if(companion != null && user instanceof Agent){
+            companion.removeCompanion(0);
+            user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Agent " + user.getName() + " lived chat. You will be sended to " +
                     "another agent.", MessageType.SERVER_MESSAGE));
             logger.info("Agent " + user.getName() + " and client " + companion.getName() + " finished chat.");
-            companion.removeCompanion(0);
-            user.removeCompanion(index);
         }
+        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
+                index));
     }
 
     private void handshake(Agent agent, Client client) throws IOException, EncodeException {
