@@ -18,7 +18,7 @@ import java.io.IOException;
 
 @ServerEndpoint(value = "/chat",decoders = {MessageDecoder.class}, encoders = {MessageEncoder.class})
 public class ChatEndpoint {
-    private static final SessionsStorage storage = new SessionsStorage();
+    private static final SessionsStorage storage = SessionsStorage.getInstance();
 
 
     @OnOpen
