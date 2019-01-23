@@ -49,7 +49,8 @@ public class Client extends User {
              ) {
             message.setType(MessageType.TEXT_MESSAGE);
             history.add(message);
-            sendMessageToCompanion(message);
+            message.setIndex(index);
+            getCompanion(0).sendMessage(message);
         }
         bufferedMessages.clear();
     }
