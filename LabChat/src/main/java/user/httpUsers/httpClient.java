@@ -18,14 +18,14 @@ public class httpClient extends Client {
 
     @Override
     public synchronized void sendMessage(Message message) throws IOException, EncodeException {
-        MessageStorage.addMessage(getId(), message);
+        MessageStorage.addMessage(id, message);
     }
 
     public synchronized ArrayList<Message> getMessages() {
-        return MessageStorage.getMessages(getId());
+        return MessageStorage.getMessages(id);
     }
 
     protected void finalize(){
-        MessageStorage.removeMessages(getId());
+        MessageStorage.removeMessages(id);
     }
 }

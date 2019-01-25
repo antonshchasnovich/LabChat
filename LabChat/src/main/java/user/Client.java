@@ -81,4 +81,12 @@ public class Client extends User {
     void setIndex(int index) {
         this.index = index;
     }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

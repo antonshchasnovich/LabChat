@@ -25,4 +25,12 @@ public class Agent extends User {
     public Agent(Session session, String name, int companionsNumber) {
         super(session, name, companionsNumber);
     }
+
+    @Override
+    public String toString() {
+        return "Agent{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

@@ -1,6 +1,7 @@
 package user;
 
 import message.Message;
+import util.IdGenerator;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
@@ -8,11 +9,13 @@ import java.io.IOException;
 import java.util.Objects;
 
 public abstract class User {
-    private Session session;
-    private final String name;
-    private User[] companions;
+    protected int id;
+    protected Session session;
+    protected final String name;
+    protected User[] companions;
 
     User(Session session, String name, int companionsNumber) {
+        this.id = IdGenerator.getUserId();
         this.session = session;
         this.name = name;
         companions = new User[companionsNumber];
