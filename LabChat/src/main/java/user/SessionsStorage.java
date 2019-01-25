@@ -4,6 +4,7 @@ import message.Message;
 import message.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import user.chat.Chat;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
@@ -18,6 +19,9 @@ public class SessionsStorage {
     private final HashMap<Session, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
+    private final HashMap<Integer, Agent> allAgents = new HashMap<>();
+    private final HashMap<Integer, Client> allClients = new HashMap<>();
+    private final HashMap<Integer, Chat> allChats = new HashMap<>();
 
     private SessionsStorage() {
     }
@@ -32,6 +36,7 @@ public class SessionsStorage {
     public void regAgent(Session session, Message msg) throws IOException, EncodeException {
         Agent agent = new Agent(session, msg.getName(), msg.getIndex());
         allUsers.put(agent.getSession(), agent);
+        allAgents.put(agent.id, agent);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
         logger.info("Agent " + msg.getName() + " registered.");
         tryFindCompanion(agent);
@@ -40,6 +45,7 @@ public class SessionsStorage {
     public void regClient(Session session, Message msg) throws IOException, EncodeException {
         Client client = new Client(session, msg.getName());
         allUsers.put(client.getSession(), client);
+        allClients.put(client.id, client);
         session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
         logger.info("Client " + msg.getName() + " registered.");
         tryFindCompanion(client);
@@ -70,6 +76,11 @@ public class SessionsStorage {
         client.setCompanion(agent);
         client.setIndex(index);
         handshake(agent, client);
+        Chat chat = new Chat(agent, client);
+        int chatId = chat.getId();
+        allChats.put(chatId, chat);
+        agent.setCurrentChatId(chatId);
+        client.setCurrentChatId(chatId);
         if (agent.isReady()) {
             tryFindCompanion(agent);
         }
@@ -91,6 +102,8 @@ public class SessionsStorage {
             User user = allUsers.get(session);
             User companion = user.getCompanion(index);
             disconnect(session, index);
+            session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
+                    index));
             if (user instanceof Client) {
                 tryFindCompanion((Agent) companion);
             } else if (user instanceof Agent) {
@@ -106,11 +119,13 @@ public class SessionsStorage {
             User companion = user.getCompanion(i);
             disconnect(session, i);
             if (user instanceof Client) {
+                allClients.remove(user.id);
                 waitingClients.remove(user);
                 if (companion != null) {
                     tryFindCompanion((Agent) companion);
                 }
             } else if (user instanceof Agent) {
+                allAgents.remove(user.id);
                 freeAgents.remove(user);
                 if (companion != null) {
                     tryFindCompanion((Client) companion);
@@ -123,6 +138,7 @@ public class SessionsStorage {
     private void disconnect(Session session, int index) throws IOException, EncodeException {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
+        allChats.remove(user.getCurrentChatId());
         if (companion != null && user instanceof Client) {
             companion.removeCompanion(((Client) user).getIndex());
             user.removeCompanion(index);
@@ -136,8 +152,6 @@ public class SessionsStorage {
                     "another agent.", MessageType.SERVER_MESSAGE));
             logger.info("Agent " + user.getName() + " and client " + companion.getName() + " finished chat.");
         }
-        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
-                index));
     }
 
     private void handshake(Agent agent, Client client) throws IOException, EncodeException {
@@ -178,6 +192,19 @@ public class SessionsStorage {
 
     public ArrayDeque<Client> getWaitingClients() {
         return waitingClients;
+    }
+
+
+    public HashMap<Integer, Agent> getAllAgents() {
+        return allAgents;
+    }
+
+    public HashMap<Integer, Client> getAllClients() {
+        return allClients;
+    }
+
+    public HashMap<Integer, Chat> getAllChats() {
+        return allChats;
     }
 
 
