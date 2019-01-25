@@ -53,7 +53,9 @@ public class SessionsStorage {
 
     synchronized void tryFindCompanion(Agent agent) throws IOException, EncodeException {
         if (waitingClients.isEmpty()) {
-            freeAgents.addLast(agent);
+            if (!freeAgents.contains(agent)) {
+                freeAgents.addLast(agent);
+            }
         } else {
             Client client = waitingClients.poll();
             createChat(agent, client);
@@ -79,8 +81,8 @@ public class SessionsStorage {
         Chat chat = new Chat(agent, client);
         int chatId = chat.getId();
         allChats.put(chatId, chat);
-        agent.setCurrentChatId(chatId);
-        client.setCurrentChatId(chatId);
+        agent.addCurrentChatId(index, chatId);
+        client.addCurrentChatId(0, chatId);
         if (agent.isReady()) {
             tryFindCompanion(agent);
         }
@@ -138,8 +140,9 @@ public class SessionsStorage {
     private void disconnect(Session session, int index) throws IOException, EncodeException {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
-        allChats.remove(user.getCurrentChatId());
+        user.removeCurrentChatId(index);
         if (companion != null && user instanceof Client) {
+            companion.removeCurrentChatId(((Client) user).getIndex());
             companion.removeCompanion(((Client) user).getIndex());
             user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Client " + user.getName() + " lived chat.",
@@ -147,6 +150,7 @@ public class SessionsStorage {
             logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
         } else if (companion != null && user instanceof Agent) {
             companion.removeCompanion(0);
+            user.removeCurrentChatId(0);
             user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Agent " + user.getName() + " lived chat. You will be sended to " +
                     "another agent.", MessageType.SERVER_MESSAGE));

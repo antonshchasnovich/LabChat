@@ -6,20 +6,27 @@ import util.IdGenerator;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Objects;
 
 public abstract class User {
+    protected Date regTime;
     protected int id;
-    protected int currentChatId;
+    protected int[] currentChatsId;
     protected Session session;
     protected final String name;
     protected User[] companions;
+    protected int companionsNumber;
 
     User(Session session, String name, int companionsNumber) {
-        currentChatId = 0;
-        this.id = IdGenerator.getUserId();
+        regTime = new Date();
+        currentChatsId = new int[companionsNumber];
+        id = IdGenerator.getUserId();
         this.session = session;
         this.name = name;
+        this.companionsNumber = companionsNumber;
         companions = new User[companionsNumber];
     }
 
@@ -51,10 +58,6 @@ public abstract class User {
         return session;
     }
 
-    String getName() {
-        return name;
-    }
-
     User getCompanion(int index) {
         return companions[index];
     }
@@ -82,8 +85,8 @@ public abstract class User {
         return false;
     }
 
-    int getCompanionsNumber() {
-        return companions.length;
+    public int getCompanionsNumber() {
+        return companionsNumber;
     }
 
     void setSession(Session session) {
@@ -98,11 +101,43 @@ public abstract class User {
         return id;
     }
 
-    public int getCurrentChatId() {
-        return currentChatId;
+    public String getName() {
+        return name;
     }
 
-    public void setCurrentChatId(int currentChatId) {
-        this.currentChatId = currentChatId;
+    public String getCompanions() {
+        String result = "";
+        for (int i = 0; i < companions.length; i++ ){
+            if (companions[i] != null){
+                result += companions[i] + "; ";
+            }
+        }
+        if (result.equals(""))return "doesn't have companions now";
+        return result;
     }
+
+    public String getCurrentChatsId() {
+        String result = "";
+        for (int i = 0; i < currentChatsId.length; i++ ){
+            if (currentChatsId[i] != 0){
+                result += currentChatsId[i] + "; ";
+            }
+        }
+        if (result.equals(""))return "doesn't have chats now";
+        return result;
+    }
+
+    public void addCurrentChatId(int index, int currentChatId) {
+        currentChatsId[index] = currentChatId;
+    }
+
+    public void removeCurrentChatId(int index) {
+        currentChatsId[index] = 0;
+    }
+
+    public Date getRegTime() {
+        return regTime;
+    }
+
+
 }
