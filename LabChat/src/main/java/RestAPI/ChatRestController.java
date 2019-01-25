@@ -23,6 +23,12 @@ public class ChatRestController {
         return storage.getAllAgents().toString();
     }
 
+    @RequestMapping(value = "/allFreeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public String getAllFreeAgents(ModelMap map){
+        return storage.getFreeAgents().toString();
+    }
+
     @RequestMapping(value = "/sessionId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String testMestod(HttpServletRequest request){
