@@ -10,11 +10,13 @@ import java.util.Objects;
 
 public abstract class User {
     protected int id;
+    protected int currentChatId;
     protected Session session;
     protected final String name;
     protected User[] companions;
 
     User(Session session, String name, int companionsNumber) {
+        currentChatId = 0;
         this.id = IdGenerator.getUserId();
         this.session = session;
         this.name = name;
@@ -62,13 +64,14 @@ public abstract class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(session, user.session) &&
+        return id == user.id &&
+                Objects.equals(session, user.session) &&
                 Objects.equals(name, user.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(session, name);
+        return Objects.hash(id, session, name);
     }
 
     boolean isReady() {
@@ -89,5 +92,17 @@ public abstract class User {
 
     boolean isChatting(int index) {
         return companions[index] != null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getCurrentChatId() {
+        return currentChatId;
+    }
+
+    public void setCurrentChatId(int currentChatId) {
+        this.currentChatId = currentChatId;
     }
 }
