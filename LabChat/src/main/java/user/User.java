@@ -23,7 +23,7 @@ public abstract class User {
     User(Session session, String name, int companionsNumber) {
         regTime = new Date();
         currentChatsId = new int[companionsNumber];
-        id = IdGenerator.getUserId();
+        id = IdGenerator.getInstance().getUserId();
         this.session = session;
         this.name = name;
         this.companionsNumber = companionsNumber;

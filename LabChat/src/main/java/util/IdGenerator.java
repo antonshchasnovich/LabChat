@@ -1,14 +1,24 @@
 package util;
 
 public class IdGenerator {
-    private static int userId = 0;
-    private static int chatId = 0;
+    private int userId = 0;
+    private int chatId = 0;
+    private static IdGenerator instance;
 
-    public static synchronized int getUserId(){
+    public static synchronized IdGenerator getInstance(){
+        if (instance == null){
+            instance = new IdGenerator();
+        }
+        return instance;
+    }
+
+    private IdGenerator(){}
+
+    public synchronized int getUserId(){
         return ++userId;
     }
 
-    public static synchronized int getChatId(){
+    public synchronized int getChatId(){
         return ++chatId;
     }
 }

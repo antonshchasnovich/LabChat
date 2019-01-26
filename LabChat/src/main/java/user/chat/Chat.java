@@ -10,7 +10,7 @@ public class Chat {
     private Client client;
 
     public Chat(Agent agent, Client client) {
-        id = IdGenerator.getChatId();
+        id = IdGenerator.getInstance().getChatId();
         this.agent = agent;
         this.client = client;
     }
