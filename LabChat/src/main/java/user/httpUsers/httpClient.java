@@ -10,22 +10,24 @@ import java.util.ArrayList;
 
 public class httpClient extends Client {
     private HttpSession session;
+    MessageStorage storage;
 
     public httpClient(HttpSession session, String name){
         super(null, name);
         this.session = session;
+        storage = MessageStorage.getInstance();
     }
 
     @Override
     public synchronized void sendMessage(Message message) throws IOException, EncodeException {
-        MessageStorage.addMessage(id, message);
+        storage.addMessage(id, message);
     }
 
     public synchronized ArrayList<Message> getMessages() {
-        return MessageStorage.getMessages(id);
+        return storage.getMessages(id);
     }
 
     protected void finalize(){
-        MessageStorage.removeMessages(id);
+        storage.removeMessages(id);
     }
 }
