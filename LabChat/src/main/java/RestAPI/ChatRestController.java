@@ -46,6 +46,12 @@ public class ChatRestController {
         return result;
     }
 
+    @RequestMapping(value = "/freeAgentsCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public int getFreeAgentsCount(ModelMap map){
+        return storage.getFreeAgents().size();
+    }
+
     @RequestMapping(value = "/sessionId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public String testMestod(HttpServletRequest request){
