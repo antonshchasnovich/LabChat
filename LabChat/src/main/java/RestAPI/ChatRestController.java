@@ -19,6 +19,7 @@ import user.Client;
 import user.SessionsStorage;
 import user.chat.Chat;
 import user.httpUsers.HttpAgent;
+import user.httpUsers.HttpClient;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -107,6 +108,19 @@ public class ChatRestController {
         HttpAgent agent = new HttpAgent(request.getSession(), name);
         try {
             storage.regAgent(agent);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/registerClient/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity regClient(@PathVariable("name") String name, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        HttpClient client = new HttpClient(request.getSession(), name);
+        try {
+            storage.regClient(client);
         } catch (IOException | EncodeException e) {
             storage.getLogger().error("", e);
         }
