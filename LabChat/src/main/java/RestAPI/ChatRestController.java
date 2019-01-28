@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import user.Agent;
+import user.Client;
 import user.SessionsStorage;
 import user.chat.Chat;
 
@@ -38,12 +39,22 @@ public class ChatRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/allFreeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<ArrayList<DTSUser>> getAllFreeAgents(ModelMap map){
+    @RequestMapping(value = "/freeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getFreeAgents(ModelMap map){
         ArrayList<DTSUser> result = new ArrayList<>();
         for (Agent agent:storage.getFreeAgents()
         ) {
             result.add(new DTSUser(agent));
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/waitingClients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getWaitingClients(ModelMap map){
+        ArrayList<DTSUser> result = new ArrayList<>();
+        for (Client client:storage.getWaitingClients()
+        ) {
+            result.add(new DTSUser(client));
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
