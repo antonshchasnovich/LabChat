@@ -17,20 +17,20 @@ public class MessageStorage {
         return instance;
     }
 
-    private HashMap<Integer, ArrayList<Message>> allMessages = new HashMap<>();
+    private HashMap<Long, ArrayList<Message>> allMessages = new HashMap<>();
 
-    public synchronized void addMessage(int id, Message message){
+    public synchronized void addMessage(long id, Message message){
         allMessages.computeIfAbsent(id, k -> new ArrayList<>());
         allMessages.get(id).add(message);
     }
 
-    public synchronized ArrayList<Message> getMessages(int id){
+    public synchronized ArrayList<Message> getMessages(long id){
         ArrayList<Message> result = new ArrayList<>(allMessages.get(id));
         allMessages.get(id).clear();
         return result;
     }
 
-    public synchronized void removeMessages(int id){
+    public synchronized void removeMessages(long id){
         allMessages.remove(id);
     }
 }

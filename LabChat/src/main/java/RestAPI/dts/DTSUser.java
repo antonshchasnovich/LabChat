@@ -4,7 +4,7 @@ import user.User;
 import java.util.Date;
 
 public class DTSUser {
-    protected final int id;
+    protected final long id;
     protected final String name;
     protected final Date regTime;
 

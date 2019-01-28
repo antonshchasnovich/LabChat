@@ -60,14 +60,14 @@ public class ChatRestController {
     }
 
     @RequestMapping(value = "/infoAboutAgent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AllInfoAboutUser> getInfoAboutAgent(@PathVariable("id") int id, ModelMap map){
+    public ResponseEntity<AllInfoAboutUser> getInfoAboutAgent(@PathVariable("id") long id, ModelMap map){
         Agent agent = storage.getAllAgents().get(id);
         if (agent == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(new AllInfoAboutUser(agent), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/infoAboutClient/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AllInfoAboutUser> getInfoAboutClient(@PathVariable("id") int id, ModelMap map){
+    public ResponseEntity<AllInfoAboutUser> getInfoAboutClient(@PathVariable("id") long id, ModelMap map){
         Client client = storage.getAllClients().get(id);
         if (client == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(new AllInfoAboutUser(client), HttpStatus.OK);
@@ -89,7 +89,7 @@ public class ChatRestController {
     }
 
     @RequestMapping(value = "/infoAboutChat/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<AllInfoAboutChat> getInfoAboutChat(@PathVariable("id") int id, ModelMap map){
+    public ResponseEntity<AllInfoAboutChat> getInfoAboutChat(@PathVariable("id") long id, ModelMap map){
         Chat chat = storage.getAllChats().get(id);
         if (chat == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(new AllInfoAboutChat(chat), HttpStatus.OK);

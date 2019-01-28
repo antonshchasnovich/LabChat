@@ -19,9 +19,9 @@ public class SessionsStorage {
     private final HashMap<Session, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
-    private final HashMap<Integer, Agent> allAgents = new HashMap<>();
-    private final HashMap<Integer, Client> allClients = new HashMap<>();
-    private final HashMap<Integer, Chat> allChats = new HashMap<>();
+    private final HashMap<Long, Agent> allAgents = new HashMap<>();
+    private final HashMap<Long, Client> allClients = new HashMap<>();
+    private final HashMap<Long, Chat> allChats = new HashMap<>();
 
     private SessionsStorage() {
     }
@@ -79,7 +79,7 @@ public class SessionsStorage {
         client.setIndex(index);
         handshake(agent, client);
         Chat chat = new Chat(agent, client);
-        int chatId = chat.getId();
+        long chatId = chat.getId();
         allChats.put(chatId, chat);
         agent.addCurrentChatId(index, chatId);
         client.addCurrentChatId(0, chatId);
@@ -117,7 +117,7 @@ public class SessionsStorage {
 
     public synchronized void exitChat(Session session) throws IOException, EncodeException {
         User user = allUsers.get(session);
-        for (int i = 0; i < user.getCompanionsNumber(); i++) {
+        for (int i = 0; i < user.getMaxCompanionsNumber(); i++) {
             User companion = user.getCompanion(i);
             disconnect(session, i);
             if (user instanceof Client) {
@@ -199,15 +199,15 @@ public class SessionsStorage {
     }
 
 
-    public HashMap<Integer, Agent> getAllAgents() {
+    public HashMap<Long, Agent> getAllAgents() {
         return allAgents;
     }
 
-    public HashMap<Integer, Client> getAllClients() {
+    public HashMap<Long, Client> getAllClients() {
         return allClients;
     }
 
-    public HashMap<Integer, Chat> getAllChats() {
+    public HashMap<Long, Chat> getAllChats() {
         return allChats;
     }
 

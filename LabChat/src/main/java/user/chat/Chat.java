@@ -7,7 +7,7 @@ import util.IdGenerator;
 import java.util.Date;
 
 public class Chat {
-    private int id;
+    private long id;
     private Agent agent;
     private Client client;
     private Date startTime;
@@ -19,7 +19,7 @@ public class Chat {
         startTime = new Date();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

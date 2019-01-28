@@ -3,9 +3,9 @@ package RestAPI.dts;
 import user.chat.Chat;
 
 public class DTSChat {
-    private int id;
-    private int clientId;
-    private int agentId;
+    private long id;
+    private long clientId;
+    private long agentId;
 
     public DTSChat(Chat chat) {
         id = chat.getId();

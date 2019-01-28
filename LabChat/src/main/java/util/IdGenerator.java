@@ -1,8 +1,8 @@
 package util;
 
 public class IdGenerator {
-    private int userId = 0;
-    private int chatId = 0;
+    private long userId = 0;
+    private long chatId = 0;
     private static IdGenerator instance;
 
     public static synchronized IdGenerator getInstance(){
@@ -14,11 +14,11 @@ public class IdGenerator {
 
     private IdGenerator(){}
 
-    public synchronized int getUserId(){
+    public synchronized long getUserId(){
         return ++userId;
     }
 
-    public synchronized int getChatId(){
+    public synchronized long getChatId(){
         return ++chatId;
     }
 }

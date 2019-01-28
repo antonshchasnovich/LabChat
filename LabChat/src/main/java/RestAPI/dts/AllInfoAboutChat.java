@@ -5,7 +5,7 @@ import user.chat.Chat;
 import java.util.Date;
 
 public class AllInfoAboutChat {
-    private int id;
+    private long id;
     private Date startTime;
     private long duration;
     private DTSUser agent;

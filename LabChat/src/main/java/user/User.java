@@ -12,22 +12,22 @@ import java.util.Date;
 import java.util.Objects;
 
 public abstract class User {
-    protected final int id;
+    protected final long id;
     protected final String name;
     protected final Date regTime;
 
-    protected int[] currentChatsId;
+    protected long[] currentChatsId;
     protected Session session;
     protected User[] companions;
-    protected int companionsNumber;
+    protected int maxCompanionsNumber;
 
     User(Session session, String name, int companionsNumber) {
         regTime = new Date();
-        currentChatsId = new int[companionsNumber];
+        currentChatsId = new long[companionsNumber];
         id = IdGenerator.getInstance().getUserId();
         this.session = session;
         this.name = name;
-        this.companionsNumber = companionsNumber;
+        this.maxCompanionsNumber = companionsNumber;
         companions = new User[companionsNumber];
     }
 
@@ -86,8 +86,8 @@ public abstract class User {
         return false;
     }
 
-    public int getCompanionsNumber() {
-        return companionsNumber;
+    public int getMaxCompanionsNumber() {
+        return maxCompanionsNumber;
     }
 
     void setSession(Session session) {
@@ -98,7 +98,7 @@ public abstract class User {
         return companions[index] != null;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -106,7 +106,7 @@ public abstract class User {
         return name;
     }
 
-    public int[] getCurrentChatsId() {
+    public long[] getCurrentChatsId() {
         return currentChatsId;
     }
 
@@ -114,29 +114,7 @@ public abstract class User {
         return companions;
     }
 
-    //    public String getCompanions() {
-//        String result = "";
-//        for (int i = 0; i < companions.length; i++ ){
-//            if (companions[i] != null){
-//                result += companions[i] + "; ";
-//            }
-//        }
-//        if (result.equals(""))return "doesn't have companions now";
-//        return result;
-//    }
-
-//    public String getCurrentChatsId() {
-//        String result = "";
-//        for (int i = 0; i < currentChatsId.length; i++ ){
-//            if (currentChatsId[i] != 0){
-//                result += currentChatsId[i] + "; ";
-//            }
-//        }
-//        if (result.equals(""))return "doesn't have chats now";
-//        return result;
-//    }
-
-    public void addCurrentChatId(int index, int currentChatId) {
+    public void addCurrentChatId(int index, long currentChatId) {
         currentChatsId[index] = currentChatId;
     }
 
