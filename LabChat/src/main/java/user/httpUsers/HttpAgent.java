@@ -8,7 +8,7 @@ import javax.websocket.EncodeException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class HttpAgent extends Agent {
+public class HttpAgent extends Agent implements HttpUser {
     private HttpSession session;
     MessageStorage storage;
 

@@ -68,7 +68,7 @@ public class ChatEndpoint {
               storage.regClient(client);
           }
           else if(msg.getType() == MessageType.LEAVE_MESSAGE){
-              storage.leaveChat(session, msg);
+              storage.leaveChat(session, msg.getIndex());
           }
       }catch (IOException | EncodeException e){
           storage.getLogger().error("", e);

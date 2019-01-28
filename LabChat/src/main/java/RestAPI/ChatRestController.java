@@ -151,4 +151,28 @@ public class ChatRestController {
         HttpUser httpUser = (HttpUser) storage.getAllUsers().get(session);
         return new ResponseEntity(httpUser.getMessages(), HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/leave", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity leaveChat(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(!storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        try {
+            storage.leaveChat(session, 0);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/exit", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity exitChat(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(!storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        try {
+            storage.exitChat(session);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }

@@ -96,13 +96,12 @@ public class SessionsStorage {
         user.sendMessageToCompanion(message);
     }
 
-    public void leaveChat(Session session, Message msg) throws IOException, EncodeException {
-        int index = msg.getIndex();
+    public void leaveChat(Object session, int index) throws IOException, EncodeException {
         if (allUsers.get(session).isChatting(index)) {
             User user = allUsers.get(session);
             User companion = user.getCompanion(index);
             disconnect(session, index);
-            session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
+            user.sendMessage(new Message(SERVER_NAME, "You lived chat.", MessageType.SERVER_MESSAGE,
                     index));
             if (user instanceof Client) {
                 tryFindCompanion((Agent) companion);
@@ -113,7 +112,7 @@ public class SessionsStorage {
         }
     }
 
-    public synchronized void exitChat(Session session) throws IOException, EncodeException {
+    public synchronized void exitChat(Object session) throws IOException, EncodeException {
         User user = allUsers.get(session);
         for (int i = 0; i < user.getMaxCompanionsNumber(); i++) {
             User companion = user.getCompanion(i);
@@ -135,7 +134,7 @@ public class SessionsStorage {
         allUsers.remove(session);
     }
 
-    private void disconnect(Session session, int index) throws IOException, EncodeException {
+    private void disconnect(Object session, int index) throws IOException, EncodeException {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
         user.removeCurrentChatId(index);
