@@ -16,7 +16,7 @@ public class SessionsStorage {
     private static SessionsStorage instance;
     private Logger logger = LoggerFactory.getLogger(SessionsStorage.class);
     private final static String SERVER_NAME = "Server";
-    private final HashMap<Session, User> allUsers = new HashMap<>();
+    private final HashMap<Object, User> allUsers = new HashMap<>();
     private ArrayDeque<Agent> freeAgents = new ArrayDeque<>();
     private ArrayDeque<Client> waitingClients = new ArrayDeque<>();
     private final HashMap<Long, Agent> allAgents = new HashMap<>();
@@ -33,21 +33,19 @@ public class SessionsStorage {
         return instance;
     }
 
-    public void regAgent(Session session, Message msg) throws IOException, EncodeException {
-        Agent agent = new Agent(session, msg.getName(), msg.getIndex());
+    public void regAgent(Agent agent) throws IOException, EncodeException {
         allUsers.put(agent.getSession(), agent);
         allAgents.put(agent.id, agent);
-        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
-        logger.info("Agent " + msg.getName() + " registered.");
+        agent.sendMessage(new Message(SERVER_NAME, "You registered like agent.", MessageType.SERVER_MESSAGE));
+        logger.info("Agent " + agent.getName() + " registered.");
         tryFindCompanion(agent);
     }
 
-    public void regClient(Session session, Message msg) throws IOException, EncodeException {
-        Client client = new Client(session, msg.getName());
+    public void regClient(Client client) throws IOException, EncodeException {
         allUsers.put(client.getSession(), client);
         allClients.put(client.id, client);
-        session.getBasicRemote().sendObject(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
-        logger.info("Client " + msg.getName() + " registered.");
+        client.sendMessage(new Message(SERVER_NAME, "You registered like client.", MessageType.SERVER_MESSAGE));
+        logger.info("Client " + client.getName() + " registered.");
         tryFindCompanion(client);
     }
 
@@ -186,7 +184,7 @@ public class SessionsStorage {
         return logger;
     }
 
-    public HashMap<Session, User> getAllUsers() {
+    public HashMap<Object, User> getAllUsers() {
         return allUsers;
     }
 

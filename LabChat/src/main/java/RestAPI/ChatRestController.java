@@ -18,9 +18,12 @@ import user.Agent;
 import user.Client;
 import user.SessionsStorage;
 import user.chat.Chat;
+import user.httpUsers.HttpAgent;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.websocket.EncodeException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Controller
@@ -97,10 +100,16 @@ public class ChatRestController {
 
 
 
-    @RequestMapping(value = "/sessionId", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public String testMestod(HttpServletRequest request){
+    @RequestMapping(value = "/registerAgent/{name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity regAgent(@PathVariable("name") String name, HttpServletRequest request){
         HttpSession session = request.getSession();
-        return request.getSession().getId();
+        if(storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        HttpAgent agent = new HttpAgent(request.getSession(), name);
+        try {
+            storage.regAgent(agent);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

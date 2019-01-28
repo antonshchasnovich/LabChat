@@ -4,6 +4,8 @@ import coders.MessageDecoder;
 import coders.MessageEncoder;
 import message.Message;
 import message.MessageType;
+import user.Agent;
+import user.Client;
 import user.SessionsStorage;
 
 
@@ -58,10 +60,12 @@ public class ChatEndpoint {
               storage.sendMessage(session, msg);
           }
           else if(msg.getType() == MessageType.AGENT_REG_MESSAGE){
-              storage.regAgent(session, msg);
+              Agent agent = new Agent(session, msg.getName(), msg.getIndex());
+              storage.regAgent(agent);
           }
           else if(msg.getType() == MessageType.CLIENT_REG_MESSAGE){
-              storage.regClient(session, msg);
+              Client client = new Client(session, msg.getName());
+              storage.regClient(client);
           }
           else if(msg.getType() == MessageType.LEAVE_MESSAGE){
               storage.leaveChat(session, msg);

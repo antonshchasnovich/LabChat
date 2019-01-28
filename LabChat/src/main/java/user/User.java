@@ -55,7 +55,7 @@ public abstract class User {
         companions[index] = null;
     }
 
-    Session getSession() {
+    public Object getSession() {
         return session;
     }
 

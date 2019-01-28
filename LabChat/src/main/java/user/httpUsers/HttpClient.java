@@ -1,18 +1,18 @@
 package user.httpUsers;
 
 import message.Message;
-import user.Agent;
+import user.Client;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.EncodeException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class httpAgent extends Agent {
+public class HttpClient extends Client {
     private HttpSession session;
     MessageStorage storage;
 
-    public httpAgent(HttpSession session, String name){
+    public HttpClient(HttpSession session, String name){
         super(null, name);
         this.session = session;
         storage = MessageStorage.getInstance();
@@ -29,5 +29,10 @@ public class httpAgent extends Agent {
 
     protected void finalize(){
         storage.removeMessages(id);
+    }
+
+    @Override
+    public Object getSession() {
+        return session;
     }
 }
