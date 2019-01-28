@@ -66,6 +66,13 @@ public class ChatRestController {
         return new ResponseEntity<>(new AllInfoAboutUser(agent), HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/infoAboutClient/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AllInfoAboutUser> getInfoAboutClient(@PathVariable("id") int id, ModelMap map){
+        Client client = storage.getAllClients().get(id);
+        if (client == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new AllInfoAboutUser(client), HttpStatus.OK);
+    }
+
     @RequestMapping(value = "/freeAgentsCount", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<Integer> getFreeAgentsCount(ModelMap map){
         return new ResponseEntity<>(storage.getFreeAgents().size(), HttpStatus.OK);
