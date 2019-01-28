@@ -16,7 +16,7 @@ public class Agent extends User {
     public void sendMessageToCompanion(Message message) throws IOException, EncodeException {
         User companion = super.getCompanion(message.getIndex());
         if(companion != null){
-            super.sendMessage(message);
+            sendMessage(message);
             message.setIndex(0);
             companion.sendMessage(message);
         }

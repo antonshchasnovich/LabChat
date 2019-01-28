@@ -5,6 +5,7 @@ import RestAPI.dts.AllInfoAboutUser;
 import RestAPI.dts.DTSChat;
 import RestAPI.dts.DTSUser;
 import message.Message;
+import message.MessageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import user.Agent;
 import user.Client;
 import user.SessionsStorage;
@@ -30,6 +30,7 @@ import java.util.ArrayList;
 @Controller
 @RequestMapping(value = "/api")
 public class ChatRestController {
+    private String name;
 
     private static SessionsStorage storage = SessionsStorage.getInstance();
 
@@ -111,6 +112,7 @@ public class ChatRestController {
         } catch (IOException | EncodeException e) {
             storage.getLogger().error("", e);
         }
+        this.name = name;
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -121,6 +123,20 @@ public class ChatRestController {
         HttpClient client = new HttpClient(request.getSession(), name);
         try {
             storage.regClient(client);
+        } catch (IOException | EncodeException e) {
+            storage.getLogger().error("", e);
+        }
+        this.name = name;
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/sendMessage/{text}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity sendMessage(@PathVariable("text") String text, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(!storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        Message message = new Message(name, text, MessageType.TEXT_MESSAGE);
+        try {
+            storage.sendMessage(session, message);
         } catch (IOException | EncodeException e) {
             storage.getLogger().error("", e);
         }

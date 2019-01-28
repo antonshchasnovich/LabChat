@@ -86,7 +86,7 @@ public class SessionsStorage {
         }
     }
 
-    public void sendMessage(Session session, Message message) throws IOException, EncodeException {
+    public void sendMessage(Object session, Message message) throws IOException, EncodeException {
         User user = allUsers.get(session);
         if (user.getCompanion(message.getIndex()) == null && user instanceof Client && !waitingClients.contains(user)) {
             tryFindCompanion((Client) user);
