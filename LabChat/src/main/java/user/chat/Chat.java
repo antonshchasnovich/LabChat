@@ -4,24 +4,19 @@ import user.Agent;
 import user.Client;
 import util.IdGenerator;
 
+import java.util.Date;
+
 public class Chat {
     private int id;
     private Agent agent;
     private Client client;
+    private Date startTime;
 
     public Chat(Agent agent, Client client) {
         id = IdGenerator.getInstance().getChatId();
         this.agent = agent;
         this.client = client;
-    }
-
-    @Override
-    public String toString() {
-        return "Chat{" +
-                "id=" + id +
-                ", agent=" + agent +
-                ", client=" + client +
-                '}';
+        startTime = new Date();
     }
 
     public int getId() {
@@ -34,5 +29,9 @@ public class Chat {
 
     public Client getClient() {
         return client;
+    }
+
+    public Date getStartTime() {
+        return startTime;
     }
 }

@@ -1,5 +1,6 @@
 package RestAPI;
 
+import RestAPI.dts.AllInfoAboutChat;
 import RestAPI.dts.AllInfoAboutUser;
 import RestAPI.dts.DTSChat;
 import RestAPI.dts.DTSUser;
@@ -47,7 +48,7 @@ public class ChatRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getInfoAboutAgent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/infoAboutAgent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AllInfoAboutUser> getInfoAboutAgent(@PathVariable("id") int id, ModelMap map){
         Agent agent = storage.getAllAgents().get(id);
         if (agent == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -67,6 +68,13 @@ public class ChatRestController {
             result.add(new DTSChat(chat));
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/infoAboutChat/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AllInfoAboutChat> getInfoAboutChat(@PathVariable("id") int id, ModelMap map){
+        Chat chat = storage.getAllChats().get(id);
+        if (chat == null)return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new AllInfoAboutChat(chat), HttpStatus.OK);
     }
 
 
