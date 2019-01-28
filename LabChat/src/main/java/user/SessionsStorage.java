@@ -137,6 +137,7 @@ public class SessionsStorage {
     private void disconnect(Object session, int index) throws IOException, EncodeException {
         User user = allUsers.get(session);
         User companion = user.getCompanion(index);
+        allChats.remove(user.currentChatsId[index]);
         user.removeCurrentChatId(index);
         if (companion != null && user instanceof Client) {
             companion.removeCurrentChatId(((Client) user).getIndex());
@@ -146,8 +147,8 @@ public class SessionsStorage {
                     MessageType.SERVER_MESSAGE, ((Client) user).getIndex()));
             logger.info("Agent " + companion.getName() + " and client " + user.getName() + " finished chat.");
         } else if (companion != null && user instanceof Agent) {
+            companion.removeCurrentChatId(0);
             companion.removeCompanion(0);
-            user.removeCurrentChatId(0);
             user.removeCompanion(index);
             companion.sendMessage(new Message(SERVER_NAME, "Agent " + user.getName() + " lived chat. You will be sended to " +
                     "another agent.", MessageType.SERVER_MESSAGE));
