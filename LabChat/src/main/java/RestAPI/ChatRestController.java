@@ -20,6 +20,7 @@ import user.SessionsStorage;
 import user.chat.Chat;
 import user.httpUsers.HttpAgent;
 import user.httpUsers.HttpClient;
+import user.httpUsers.HttpUser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -141,5 +142,13 @@ public class ChatRestController {
             storage.getLogger().error("", e);
         }
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity getMessages(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        if(!storage.getAllUsers().keySet().contains(session))return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        HttpUser httpUser = (HttpUser) storage.getAllUsers().get(session);
+        return new ResponseEntity(httpUser.getMessages(), HttpStatus.OK);
     }
 }
