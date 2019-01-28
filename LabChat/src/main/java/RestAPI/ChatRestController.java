@@ -9,11 +9,11 @@ import message.MessageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import user.Agent;
 import user.Client;
 import user.SessionsStorage;
@@ -28,7 +28,7 @@ import javax.websocket.EncodeException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@Controller
+@RestController
 @RequestMapping(value = "/api")
 public class ChatRestController {
     private String name;

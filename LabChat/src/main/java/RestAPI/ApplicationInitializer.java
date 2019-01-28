@@ -19,10 +19,7 @@ public class ApplicationInitializer implements WebApplicationInitializer {
         ctx.register(WebConfig.class);
         servletContext.addListener(new ContextLoaderListener(ctx));
         ServletRegistration.Dynamic servlet = servletContext.addServlet(SERVLETNAME, new DispatcherServlet(ctx));
-        ServletRegistration.Dynamic servlet2 = servletContext.addServlet("chat", new DispatcherServlet(ctx));
         servlet.addMapping("/");
-        servlet2.addMapping("/");
         servlet.setLoadOnStartup(1);
-        servlet2.setLoadOnStartup(2);
     }
 }

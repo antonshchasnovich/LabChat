@@ -9,7 +9,6 @@ import user.httpUsers.HttpUser;
 import user.httpUsers.MessageStorage;
 
 import javax.websocket.EncodeException;
-import javax.websocket.Session;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.HashMap;
