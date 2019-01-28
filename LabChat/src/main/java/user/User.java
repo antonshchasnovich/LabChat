@@ -12,11 +12,12 @@ import java.util.Date;
 import java.util.Objects;
 
 public abstract class User {
-    protected Date regTime;
-    protected int id;
+    protected final int id;
+    protected final String name;
+    protected final Date regTime;
+
     protected int[] currentChatsId;
     protected Session session;
-    protected final String name;
     protected User[] companions;
     protected int companionsNumber;
 
@@ -105,27 +106,35 @@ public abstract class User {
         return name;
     }
 
-    public String getCompanions() {
-        String result = "";
-        for (int i = 0; i < companions.length; i++ ){
-            if (companions[i] != null){
-                result += companions[i] + "; ";
-            }
-        }
-        if (result.equals(""))return "doesn't have companions now";
-        return result;
+    public int[] getCurrentChatsId() {
+        return currentChatsId;
     }
 
-    public String getCurrentChatsId() {
-        String result = "";
-        for (int i = 0; i < currentChatsId.length; i++ ){
-            if (currentChatsId[i] != 0){
-                result += currentChatsId[i] + "; ";
-            }
-        }
-        if (result.equals(""))return "doesn't have chats now";
-        return result;
+    public User[] getCompanions() {
+        return companions;
     }
+
+    //    public String getCompanions() {
+//        String result = "";
+//        for (int i = 0; i < companions.length; i++ ){
+//            if (companions[i] != null){
+//                result += companions[i] + "; ";
+//            }
+//        }
+//        if (result.equals(""))return "doesn't have companions now";
+//        return result;
+//    }
+
+//    public String getCurrentChatsId() {
+//        String result = "";
+//        for (int i = 0; i < currentChatsId.length; i++ ){
+//            if (currentChatsId[i] != 0){
+//                result += currentChatsId[i] + "; ";
+//            }
+//        }
+//        if (result.equals(""))return "doesn't have chats now";
+//        return result;
+//    }
 
     public void addCurrentChatId(int index, int currentChatId) {
         currentChatsId[index] = currentChatId;
