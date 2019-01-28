@@ -27,10 +27,6 @@ public class HttpClient extends Client implements HttpUser {
         return storage.getMessages(id);
     }
 
-    protected void finalize(){
-        storage.removeMessages(id);
-    }
-
     @Override
     public Object getSession() {
         return session;

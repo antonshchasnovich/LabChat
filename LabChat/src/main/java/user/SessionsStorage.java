@@ -5,6 +5,8 @@ import message.MessageType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import user.chat.Chat;
+import user.httpUsers.HttpUser;
+import user.httpUsers.MessageStorage;
 
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
@@ -130,6 +132,9 @@ public class SessionsStorage {
                     tryFindCompanion((Client) companion);
                 }
             }
+        }
+        if (user instanceof HttpUser){
+            MessageStorage.getInstance().removeMessages(user.getId());
         }
         allUsers.remove(session);
     }
