@@ -37,7 +37,7 @@ public class ChatRestController {
 
     private static SessionsStorage storage = SessionsStorage.getInstance();
 
-    @RequestMapping(value = "/agents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/allAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<ArrayList<DTSUser>> getAllAgents(ModelMap map) {
         ArrayList<DTSUser> result = new ArrayList<>();
         for (Agent agent : storage.getAllAgents().values()
@@ -51,23 +51,11 @@ public class ChatRestController {
     public ResponseEntity<ArrayList<DTSUser>> getAgents(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize, ModelMap map) {
         if (storage.getAllAgents().size() <= pageNumber * pageSize) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         ArrayList<User> agents = new ArrayList<>(storage.getAllAgents().values());
-        ArrayList<DTSUser> result = new ArrayList<>();
-        if (storage.getAllAgents().size() <= (pageNumber + 1) * pageSize) {
-            for (User agent : agents.subList(pageNumber * pageSize, agents.size())
-            ) {
-                result.add(new DTSUser(agent));
-            }
-        } else {
-            for (User agent : agents.subList(pageNumber * pageSize, (pageNumber + 1) * pageSize)
-            ) {
-                result.add(new DTSUser(agent));
-            }
-        }
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(subListAndConvertToDTS(agents, pageNumber, pageSize), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/freeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<ArrayList<DTSUser>> getFreeAgents(ModelMap map) {
+    @RequestMapping(value = "/allFreeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getAllFreeAgents(ModelMap map) {
         ArrayList<DTSUser> result = new ArrayList<>();
         for (Agent agent : storage.getFreeAgents()
         ) {
@@ -76,14 +64,30 @@ public class ChatRestController {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/waitingClients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<ArrayList<DTSUser>> getWaitingClients(ModelMap map) {
+    @RequestMapping(value = "/freeAgents", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getFreeAgents(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize, ModelMap map) {
+        if (storage.getFreeAgents().size() <= pageNumber * pageSize)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        ArrayList<User> agents = new ArrayList<>(storage.getFreeAgents());
+        return new ResponseEntity<>(subListAndConvertToDTS(agents, pageNumber, pageSize), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/allWaitingClients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getAllWaitingClients(ModelMap map) {
         ArrayList<DTSUser> result = new ArrayList<>();
         for (Client client : storage.getWaitingClients()
         ) {
             result.add(new DTSUser(client));
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/waitingClients", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSUser>> getWaitingClients(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize, ModelMap map) {
+        if (storage.getWaitingClients().size() <= pageNumber * pageSize)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        ArrayList<User> clients = new ArrayList<>(storage.getWaitingClients());
+        return new ResponseEntity<>(subListAndConvertToDTS(clients, pageNumber, pageSize), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/infoAboutAgent/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -105,7 +109,7 @@ public class ChatRestController {
         return new ResponseEntity<>(storage.getFreeAgents().size(), HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/chats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @RequestMapping(value = "/allChats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<ArrayList<DTSChat>> getAllChats(ModelMap map) {
         ArrayList<DTSChat> result = new ArrayList<>();
         for (Chat chat : storage.getAllChats().values()
@@ -114,6 +118,26 @@ public class ChatRestController {
         }
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/chats", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<DTSChat>> getChats(@RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize, ModelMap map) {
+        if (storage.getAllChats().size() <= pageNumber * pageSize) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        ArrayList<Chat> chats = new ArrayList<>(storage.getAllChats().values());
+        ArrayList<DTSChat> result = new ArrayList<>();
+        if (chats.size() <= (pageNumber + 1) * pageSize) {
+            for (Chat chat : chats.subList(pageNumber * pageSize, chats.size())
+            ) {
+                result.add(new DTSChat(chat));
+            }
+        } else {
+            for (Chat chat : chats.subList(pageNumber * pageSize, (pageNumber + 1) * pageSize)
+            ) {
+                result.add(new DTSChat(chat));
+            }
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     @RequestMapping(value = "/infoAboutChat/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AllInfoAboutChat> getInfoAboutChat(@PathVariable("id") long id, ModelMap map) {
@@ -164,12 +188,12 @@ public class ChatRestController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/getMessages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity getMessages(HttpServletRequest request) {
+    @RequestMapping(value = "/messages", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<ArrayList<Message>> getMessages(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        if (!storage.getAllUsers().keySet().contains(session)) return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        if (!storage.getAllUsers().keySet().contains(session)) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         HttpUser httpUser = (HttpUser) storage.getAllUsers().get(session);
-        return new ResponseEntity(httpUser.getMessages(), HttpStatus.OK);
+        return new ResponseEntity<>(httpUser.getMessages(), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/leave", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -194,5 +218,21 @@ public class ChatRestController {
             storage.getLogger().error("", e);
         }
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    private ArrayList<DTSUser> subListAndConvertToDTS(ArrayList<User> users, int pageNumber, int pageSize) {
+        ArrayList<DTSUser> result = new ArrayList<>();
+        if (users.size() <= (pageNumber + 1) * pageSize) {
+            for (User user : users.subList(pageNumber * pageSize, users.size())
+            ) {
+                result.add(new DTSUser(user));
+            }
+        } else {
+            for (User user : users.subList(pageNumber * pageSize, (pageNumber + 1) * pageSize)
+            ) {
+                result.add(new DTSUser(user));
+            }
+        }
+        return result;
     }
 }
